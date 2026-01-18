@@ -1,4 +1,4 @@
-export default function Sidebar({ courses, onSelect }) {
+export default function Sidebar({ courses, onSelectCourse, onDashboard }) {
   return (
     <div
       style={{
@@ -9,12 +9,17 @@ export default function Sidebar({ courses, onSelect }) {
         height: "100vh"
       }}
     >
-      <h2 style={{ marginBottom: 30 }}>My Grade</h2>
+      <h2
+        style={{ marginBottom: 30, cursor: "pointer" }}
+        onClick={onDashboard}
+      >
+        My Grade
+      </h2>
 
       {courses.map((course) => (
         <div
           key={course}
-          onClick={() => onSelect(course)}
+          onClick={() => onSelectCourse(course)}
           style={{
             cursor: "pointer",
             marginBottom: 15
