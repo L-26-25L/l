@@ -13,15 +13,37 @@ export default function Home() {
     "Arabica"
   ];
 
-  const [selectedCourse, setSelectedCourse] = useState("Economy");
+  const [selectedCourse, setSelectedCourse] = useState(null);
+  const [view, setView] = useState("dashboard");
 
   return (
     <div style={{ display: "flex" }}>
-      <Sidebar courses={courses} onSelect={setSelectedCourse} />
+      <Sidebar
+        courses={courses}
+        onSelectCourse={(course) => {
+          setSelectedCourse(course);
+          setView("course");
+        }}
+        onDashboard={() => {
+          setView("dashboard");
+          setSelectedCourse(null);
+        }}
+      />
 
-      <div style={{ padding: 40 }}>
-        <h1>{selectedCourse}</h1>
-        <p>هنا بتطلع الداشبورد والجدول 👌</p>
+      <div style={{ padding: 40, flex: 1 }}>
+        {view === "dashboard" && (
+          <>
+            <h1>Dashboard</h1>
+            <p>هنا بتطلع الرسوم البيانية ✨</p>
+          </>
+        )}
+
+        {view === "course" && selectedCourse && (
+          <>
+            <h1>{selectedCourse}</h1>
+            <p>هنا جدول المادة فقط 📊</p>
+          </>
+        )}
       </div>
     </div>
   );
