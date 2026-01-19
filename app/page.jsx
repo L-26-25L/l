@@ -1,8 +1,7 @@
-import CourseTable from "../components/CourseTable";
-import { coursesData } from "../data/courses";
-
 "use client";
 
+import CourseTable from "../components/CourseTable";
+import { coursesData } from "../data/courses";
 import { useState } from "react";
 import Sidebar from "../components/Sidebar";
 
