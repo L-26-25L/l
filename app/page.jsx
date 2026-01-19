@@ -1,3 +1,6 @@
+import CourseTable from "../components/CourseTable";
+import { coursesData } from "../data/courses";
+
 "use client";
 
 import { useState } from "react";
@@ -38,12 +41,12 @@ export default function Home() {
           </>
         )}
 
-        {view === "course" && selectedCourse && (
-          <>
-            <h1>{selectedCourse}</h1>
-            <p>هنا جدول المادة فقط 📊</p>
-          </>
-        )}
+      {view === "course" && selectedCourse && (
+  <>
+    <h1>{selectedCourse}</h1>
+    <CourseTable data={coursesData[selectedCourse]} />
+  </>
+)}
       </div>
     </div>
   );
