@@ -13,7 +13,38 @@ export default function CourseTable({ data }) {
       ? quizzes.reduce((min, q) =>
           q.obtained < min.obtained ? q : min
         )
-      : null;
+      : null;   
+const effectiveRows = rows.filter(
+    (row) => row !== lowestQuiz
+  );
+
+  const totalPossible = effectiveRows.reduce(
+    (sum, r) => sum + r.total,
+    0
+  );
+
+  const totalObtained = effectiveRows.reduce(
+    (sum, r) => sum + r.obtained,
+    0
+  );
+
+  const percentage =
+    totalPossible > 0
+      ? ((totalObtained / totalPossible) * 100).toFixed(2)
+      : 0;
+
+  const remainingForAPlus = Math.max(
+    0,
+    totalPossible * 0.95 - totalObtained
+  ).toFixed(2);
+
+  const remainingForA = Math.max(
+    0,
+    totalPossible * 0.90 - totalObtained
+  ).toFixed(2);
+
+
+  
 
   const handleGradeChange = (index, value) => {
     const updated = [...rows];
@@ -41,7 +72,19 @@ export default function CourseTable({ data }) {
           </button>
         </div>
       )}
-
+<div
+        style={{
+          display: "flex",
+          gap: 20,
+          marginBottom: 20
+        }}
+      >
+        <InfoBox label="Current Score" value={totalObtained} />
+        <InfoBox label="Total Possible" value={totalPossible} />
+        <InfoBox label="Percentage" value={${percentage}%} />
+        <InfoBox label="Remaining for A+" value={remainingForAPlus} />
+        <InfoBox label="Remaining for A" value={remainingForA} />
+      </div>
       <table
         style={{
           width: "100%",
@@ -94,6 +137,24 @@ export default function CourseTable({ data }) {
     </>
   );
 }
-
+function InfoBox({ label, value }) {
+  return (
+    <div
+      style={{
+        background: "#f4f4fa",
+        padding: 15,
+        borderRadius: 10,
+        minWidth: 140
+      }}
+    >
+      <div style={{ fontSize: 12, opacity: 0.7 }}>
+        {label}
+      </div>
+      <div style={{ fontSize: 20, fontWeight: "bold" }}>
+        {value}
+      </div>
+    </div>
+  );
+}
 const th = { padding: 12, textAlign: "left" };
 const td = { padding: 12, borderBottom: "1px solid #ddd" };
