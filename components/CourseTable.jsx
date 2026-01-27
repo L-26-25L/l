@@ -13,8 +13,9 @@ export default function CourseTable({ data }) {
       ? quizzes.reduce((min, q) =>
           q.obtained < min.obtained ? q : min
         )
-      : null;   
-const effectiveRows = rows.filter(
+      : null;
+
+  const effectiveRows = rows.filter(
     (row) => row !== lowestQuiz
   );
 
@@ -40,11 +41,8 @@ const effectiveRows = rows.filter(
 
   const remainingForA = Math.max(
     0,
-    totalPossible * 0.90 - totalObtained
+    totalPossible * 0.9 - totalObtained
   ).toFixed(2);
-
-
-  
 
   const handleGradeChange = (index, value) => {
     const updated = [...rows];
@@ -54,7 +52,6 @@ const effectiveRows = rows.filter(
 
   return (
     <>
-      {/* زر التحكم في نظام الكويز */}
       {quizzes.length > 0 && (
         <div style={{ marginBottom: 15 }}>
           <button
@@ -68,11 +65,14 @@ const effectiveRows = rows.filter(
               cursor: "pointer"
             }}
           >
-            {excludeQuiz ? "❌ استبعاد أقل كويز" : "✔️ حساب كل الكويزات"}
+            {excludeQuiz
+              ? "❌ Exclude Lowest Quiz"
+              : "✔️ Count All Quizzes"}
           </button>
         </div>
       )}
-<div
+
+      <div
         style={{
           display: "flex",
           gap: 20,
@@ -85,6 +85,7 @@ const effectiveRows = rows.filter(
         <InfoBox label="Remaining for A+" value={remainingForAPlus} />
         <InfoBox label="Remaining for A" value={remainingForA} />
       </div>
+
       <table
         style={{
           width: "100%",
@@ -123,10 +124,7 @@ const effectiveRows = rows.filter(
                     onChange={(e) =>
                       handleGradeChange(index, e.target.value)
                     }
-                    style={{
-                      width: 80,
-                      padding: 5
-                    }}
+                    style={{ width: 80, padding: 5 }}
                   />
                 </td>
               </tr>
@@ -137,6 +135,8 @@ const effectiveRows = rows.filter(
     </>
   );
 }
+
+/* 🔽 تحت الكومبوننت الرئيسي */
 function InfoBox({ label, value }) {
   return (
     <div
@@ -156,5 +156,7 @@ function InfoBox({ label, value }) {
     </div>
   );
 }
+
+/* 🔽 آخر شيء */
 const th = { padding: 12, textAlign: "left" };
 const td = { padding: 12, borderBottom: "1px solid #ddd" };
