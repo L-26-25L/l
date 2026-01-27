@@ -81,7 +81,8 @@ export default function CourseTable({ data }) {
       >
         <InfoBox label="Current Score" value={totalObtained} />
         <InfoBox label="Total Possible" value={totalPossible} />
-        <InfoBox label="Percentage" value={${percentage}%} />
+        <InfoBox label="Percentage" value={percentage + "%"} />
+        
         <InfoBox label="Remaining for A+" value={remainingForAPlus} />
         <InfoBox label="Remaining for A" value={remainingForA} />
       </div>
