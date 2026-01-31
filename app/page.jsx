@@ -64,16 +64,7 @@ export default function Home() {
     </div>
   );
 }
-
-/* 🔽 InfoBox component */
-function InfoBox({ label, value }) {
-  return (
-</div>
-</div>
-); // <- هذا يغلق return
-}  // <- هذا يغلق function Home
-
-/* InfoBox component */
+/* infobox component*/
 function InfoBox({ label, value }) {
   return (
     <div
@@ -91,5 +82,5 @@ function InfoBox({ label, value }) {
         {value}
       </div>
     </div>
-  ); 
-} // <- هذا يغلق InfoBox
+  );
+}
