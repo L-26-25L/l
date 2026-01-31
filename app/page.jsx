@@ -1,9 +1,9 @@
 "use client";
 
-import CourseTable from "../components/CourseTable";
-import { coursesData } from "../data/courses";
 import { useState } from "react";
 import Sidebar from "../components/Sidebar";
+import CourseTable from "../components/CourseTable";
+import { coursesData } from "../data/courses";
 
 export default function Home() {
   const courses = [
@@ -17,7 +17,8 @@ export default function Home() {
 
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [view, setView] = useState("dashboard");
-  const [metrics, setMetrics] =useState(null);
+  const [metrics, setMetrics] = useState(null);
+
   return (
     <div style={{ display: "flex" }}>
       <Sidebar
@@ -33,20 +34,53 @@ export default function Home() {
       />
 
       <div style={{ padding: 40, flex: 1 }}>
-        {view === "dashboard" && (
+        {/* 🟣 DASHBOARD */}
+        {view === "dashboard" && metrics && (
           <>
-            <h1>Dashboard</h1>
-            <p>هنا بتطلع الرسوم البيانية ✨</p>
+            <h1>My Grade</h1>
+
+            <div style={{ display: "flex", gap: 20, marginTop: 20 }}>
+              <InfoBox label="Current Score" value={metrics.totalObtained} />
+              <InfoBox label="Total Possible" value={metrics.totalPossible} />
+              <InfoBox label="Percentage" value={metrics.percentage + "%"} />
+              <InfoBox label="Remaining for A+" value={metrics.remainingForAPlus} />
+              <InfoBox label="Remaining for A" value={metrics.remainingForA} />
+            </div>
           </>
         )}
 
-      {view === "course" && selectedCourse && (
-  <>
-    <h1>{selectedCourse}</h1>
-    <CourseTable data={coursesData[selectedCourse]} />
-  </>
-)}
+        {/* 🟣 COURSE PAGE */}
+        {view === "course" && selectedCourse && (
+          <>
+            <h1>{selectedCourse}</h1>
+
+            <CourseTable
+              data={coursesData[selectedCourse]}
+              onMetricsChange={setMetrics}
+            />
+          </>
+        )}
       </div>
     </div>
   );
 }
+
+/* 🔽 InfoBox component */
+function InfoBox({ label, value }) {
+  return (
+    <div
+      style={{
+        background: "#f4f4fa",
+        padding: 15,
+        borderRadius: 10,
+        minWidth: 140
+      }}
+    >
+      <div style={{ fontSize: 12, opacity: 0.7 }}>
+        {label}
+      </div>
+      <div style={{ fontSize: 20, fontWeight: "bold" }}>
+        {value}
+      </div>
+    </div>
+  );
