@@ -1,8 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function CourseTable({ data }) {
   const [rows, setRows] = useState(data);
   const [excludeQuiz, setExcludeQuiz] = useState(true);
+
+  useEffect(() =>{setRows(data);},[data]);
 
   const quizzes = rows.filter((row) =>
     row.type.toLowerCase().includes("quiz")
