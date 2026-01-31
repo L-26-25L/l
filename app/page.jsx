@@ -84,3 +84,4 @@ function InfoBox({ label, value }) {
       </div>
     </div>
   );
+    { 
