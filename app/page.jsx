@@ -17,7 +17,7 @@ export default function Home() {
 
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [view, setView] = useState("dashboard");
-
+  const [metrics, setMetrics] =useState(null);
   return (
     <div style={{ display: "flex" }}>
       <Sidebar
