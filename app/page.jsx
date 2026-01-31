@@ -68,6 +68,14 @@ export default function Home() {
 /* 🔽 InfoBox component */
 function InfoBox({ label, value }) {
   return (
+</div>
+</div>
+); // <- هذا يغلق return
+}  // <- هذا يغلق function Home
+
+/* InfoBox component */
+function InfoBox({ label, value }) {
+  return (
     <div
       style={{
         background: "#f4f4fa",
@@ -83,5 +91,5 @@ function InfoBox({ label, value }) {
         {value}
       </div>
     </div>
-  );
-    { 
+  ); 
+} // <- هذا يغلق InfoBox
