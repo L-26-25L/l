@@ -1,10 +1,13 @@
 import { useState, useEffect } from "react";
 
-export default function CourseTable({ data }) {
+export default function CourseTable({ data, onMetricsChange }) {
   const [rows, setRows] = useState(data);
   const [excludeQuiz, setExcludeQuiz] = useState(true);
 
-  useEffect(() =>{setRows(data);},[data]);
+  // تحديث الصفوف عند تغيير المقرر
+  useEffect(() => {
+    setRows(data);
+  }, [data]);
 
   const quizzes = rows.filter((row) =>
     row.type.toLowerCase().includes("quiz")
@@ -46,6 +49,24 @@ export default function CourseTable({ data }) {
     totalPossible * 0.9 - totalObtained
   ).toFixed(2);
 
+  // إرسال المقاييس للداشبورد
+  useEffect(() => {
+    onMetricsChange?.({
+      totalObtained,
+      totalPossible,
+      percentage,
+      remainingForAPlus,
+      remainingForA
+    });
+  }, [
+    totalObtained,
+    totalPossible,
+    percentage,
+    remainingForAPlus,
+    remainingForA,
+    onMetricsChange
+  ]);
+
   const handleGradeChange = (index, value) => {
     const updated = [...rows];
     updated[index].obtained = Number(value);
@@ -73,21 +94,6 @@ export default function CourseTable({ data }) {
           </button>
         </div>
       )}
-
-      <div
-        style={{
-          display: "flex",
-          gap: 20,
-          marginBottom: 20
-        }}
-      >
-        <InfoBox label="Current Score" value={totalObtained} />
-        <InfoBox label="Total Possible" value={totalPossible} />
-        <InfoBox label="Percentage" value={percentage + "%"} />
-        
-        <InfoBox label="Remaining for A+" value={remainingForAPlus} />
-        <InfoBox label="Remaining for A" value={remainingForA} />
-      </div>
 
       <table
         style={{
@@ -139,27 +145,6 @@ export default function CourseTable({ data }) {
   );
 }
 
-/* 🔽 تحت الكومبوننت الرئيسي */
-function InfoBox({ label, value }) {
-  return (
-    <div
-      style={{
-        background: "#f4f4fa",
-        padding: 15,
-        borderRadius: 10,
-        minWidth: 140
-      }}
-    >
-      <div style={{ fontSize: 12, opacity: 0.7 }}>
-        {label}
-      </div>
-      <div style={{ fontSize: 20, fontWeight: "bold" }}>
-        {value}
-      </div>
-    </div>
-  );
-}
-
-/* 🔽 آخر شيء */
+/* 🔽 Styles */
 const th = { padding: 12, textAlign: "left" };
 const td = { padding: 12, borderBottom: "1px solid #ddd" };
