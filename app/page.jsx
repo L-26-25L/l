@@ -4,7 +4,7 @@ import { useState } from "react";
 import Sidebar from "../components/Sidebar";
 import CourseTable from "../components/CourseTable";
 import { coursesData } from "../data/courses";
-
+import CourseBarChart from "../components/CourseBarChart";
 export default function Home() {
   const courses = [
     "Economy",
@@ -38,45 +38,52 @@ export default function Home() {
         {/* 🟣 DASHBOARD */}
         {view === "dashboard" && (
           <>
-            <h1>My Grade</h1>
+         <h1>My Grade</h1>
 
-            {/* اختيار المقرر */}
-            <div style={{ marginTop: 20, marginBottom: 20 }}>
-              <select
-                value={dashboardCourse}
-                onChange={(e) => setDashboardCourse(e.target.value)}
-                style={{
-                  padding: 8,
-                  borderRadius: 6,
-                  fontSize: 14
-                }}
-              >
-                {courses.map((course) => (
-                  <option key={course} value={course}>
-                    {course}
-                  </option>
-                ))}
-              </select>
-            </div>
+{/* اختيار المقرر */}
+<div style={{ marginTop: 20, marginBottom: 20 }}>
+  <select
+    value={dashboardCourse}
+    onChange={(e) => setDashboardCourse(e.target.value)}
+    style={{
+      padding: 8,
+      borderRadius: 6,
+      fontSize: 14
+    }}
+  >
+    {courses.map((course) => (
+      <option key={course} value={course}>
+        {course}
+      </option>
+    ))}
+  </select>
+</div>
 
-            {/* المقاييس */}
-            {metrics && (
-              <div style={{ display: "flex", gap: 20 }}>
-                <InfoBox label="Current Score" value={metrics.totalObtained} />
-                <InfoBox label="Total Possible" value={metrics.totalPossible} />
-                <InfoBox label="Percentage" value={metrics.percentage + "%"} />
-                <InfoBox label="Remaining for A+" value={metrics.remainingForAPlus} />
-                <InfoBox label="Remaining for A" value={metrics.remainingForA} />
-              </div>
-            )}
+{/* المقاييس */}
+{metrics && (
+  <div style={{ display: "flex", gap: 20 }}>
+    <InfoBox label="Current Score" value={metrics.totalObtained} />
+    <InfoBox label="Total Possible" value={metrics.totalPossible} />
+    <InfoBox label="Percentage" value={metrics.percentage + "%"} />
+    <InfoBox label="Remaining for A+" value={metrics.remainingForAPlus} />
+    <InfoBox label="Remaining for A" value={metrics.remainingForA} />
+  </div>
+)}
 
-            {/* نحسب المقاييس بدون عرض الجدول */}
-            <div style={{ display: "none" }}>
-              <CourseTable
-                data={coursesData[dashboardCourse]}
-                onMetricsChange={setMetrics}
-              />
-            </div>
+{/* 🔵 خطوة رقم ٣: الشكل البياني */}
+{metrics && (
+  <div style={{ marginTop: 40 }}>
+    <ProgressRing percentage={Number(metrics.percentage)} />
+  </div>
+)}
+
+{/* نحسب المقاييس بدون عرض الجدول */}
+<div style={{ display: "none" }}>
+  <CourseTable
+    data={coursesData[dashboardCourse]}
+    onMetricsChange={setMetrics}
+  />
+</div>
           </>
         )}
 
