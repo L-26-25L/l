@@ -4,7 +4,7 @@ import { useState } from "react";
 import Sidebar from "../components/Sidebar";
 import CourseTable from "../components/CourseTable";
 import { coursesData } from "../data/courses";
-import ProgressRing from "../components/ProgressRing";
+
 export default function Home() {
   const courses = [
     "Economy",
@@ -68,13 +68,9 @@ export default function Home() {
                 <InfoBox label="Remaining for A+" value={metrics.remainingForAPlus} />
                 <InfoBox label="Remaining for A" value={metrics.remainingForA} />
               </div>
-            )} 
-            {metrics && (
-  <div style={{ display: "flex", gap: 40, marginTop: 40 }}>
-    <ProgressRing percentage={Number(metrics.percentage)} />
-  </div>
-)}
-            {/* جدول مخفي فقط للحساب */}
+            )}
+
+            {/* نحسب المقاييس بدون عرض الجدول */}
             <div style={{ display: "none" }}>
               <CourseTable
                 data={coursesData[dashboardCourse]}
@@ -84,7 +80,7 @@ export default function Home() {
           </>
         )}
 
-        {/* 🟣 COURSE PAGE */}
+        {/* 🟢 COURSE VIEW */}
         {view === "course" && selectedCourse && (
           <>
             <h1>{selectedCourse}</h1>
@@ -100,7 +96,7 @@ export default function Home() {
   );
 }
 
-/* 🔽 InfoBox */
+/* 🧩 InfoBox */
 function InfoBox({ label, value }) {
   return (
     <div
