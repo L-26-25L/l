@@ -1,14 +1,5 @@
 "use client";
 
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer
-} from "recharts";
-
 export default function CourseBarChart({ data }) {
   if (!data) return null;
 
