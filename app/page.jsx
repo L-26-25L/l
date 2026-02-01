@@ -18,7 +18,8 @@ export default function Home() {
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [view, setView] = useState("dashboard");
   const [metrics, setMetrics] = useState(null);
-  const [dashboardCourse,setDashboardCourse] = useState(courses[0]);
+  const [dashboardCourse, setDashboardCourse] = useState(courses[0]);
+
   return (
     <div style={{ display: "flex" }}>
       <Sidebar
@@ -35,49 +36,55 @@ export default function Home() {
 
       <div style={{ padding: 40, flex: 1 }}>
         {/* 🟣 DASHBOARD */}
-       {view === "dashboard" && (
-  <>
-    <h1>My Grade</h1>
+        {view === "dashboard" && (
+          <>
+            <h1>My Grade</h1>
 
-    {/* اختيار المقرر */}
-    <div style={{ marginTop: 20, marginBottom: 20 }}>
-      <select
-        value={dashboardCourse}
-        onChange={(e) => setDashboardCourse(e.target.value)}
-        style={{
-          padding: 8,
-          borderRadius: 6,
-          fontSize: 14
-        }}
-      >
-        {courses.map((course) => (
-          <option key={course} value={course}>
-            {course}
-          </option>
-        ))}
-      </select>
-    </div>
+            {/* اختيار المقرر */}
+            <div style={{ marginTop: 20, marginBottom: 20 }}>
+              <select
+                value={dashboardCourse}
+                onChange={(e) => setDashboardCourse(e.target.value)}
+                style={{
+                  padding: 8,
+                  borderRadius: 6,
+                  fontSize: 14
+                }}
+              >
+                {courses.map((course) => (
+                  <option key={course} value={course}>
+                    {course}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-    {/* المقاييس */}
-    {metrics && (
-      <div style={{ display: "flex", gap: 20 }}>
-        <InfoBox label="Current Score" value={metrics.totalObtained} />
-        <InfoBox label="Total Possible" value={metrics.totalPossible} />
-        <InfoBox label="Percentage" value={metrics.percentage + "%"} />
-        <InfoBox label="Remaining for A+" value={metrics.remainingForAPlus} />
-        <InfoBox label="Remaining for A" value={metrics.remainingForA} />
-      </div>
-    )}
+            {/* المقاييس */}
+            {metrics && (
+              <div style={{ display: "flex", gap: 20 }}>
+                <InfoBox label="Current Score" value={metrics.totalObtained} />
+                <InfoBox label="Total Possible" value={metrics.totalPossible} />
+                <InfoBox label="Percentage" value={metrics.percentage + "%"} />
+                <InfoBox label="Remaining for A+" value={metrics.remainingForAPlus} />
+                <InfoBox label="Remaining for A" value={metrics.remainingForA} />
+              </div>
+            )}
 
-    {/* نحسب المقاييس بدون عرض الجدول */}
-    <div style={{ display: "none" }}>
-      <CourseTable
-        data={coursesData[dashboardCourse]}
-        onMetricsChange={setMetrics}
-      />
-    </div>
-  </>
-)}
+            {/* جدول مخفي فقط للحساب */}
+            <div style={{ display: "none" }}>
+              <CourseTable
+                data={coursesData[dashboardCourse]}
+                onMetricsChange={setMetrics}
+              />
+            </div>
+          </>
+        )}
+
+        {/* 🟣 COURSE PAGE */}
+        {view === "course" && selectedCourse && (
+          <>
+            <h1>{selectedCourse}</h1>
+
             <CourseTable
               data={coursesData[selectedCourse]}
               onMetricsChange={setMetrics}
@@ -88,7 +95,8 @@ export default function Home() {
     </div>
   );
 }
-/* infobox component*/
+
+/* 🔽 InfoBox */
 function InfoBox({ label, value }) {
   return (
     <div
