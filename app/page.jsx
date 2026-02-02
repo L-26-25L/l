@@ -4,7 +4,6 @@ import { useState } from "react";
 import Sidebar from "../components/Sidebar";
 import CourseTable from "../components/CourseTable";
 import { coursesData } from "../data/courses";
-import ProgressRing from "../components/ProgressRing";
 
 export default function Home() {
   const courses = [
@@ -61,12 +60,7 @@ export default function Home() {
               </div>
             )}
 
-            {metrics && (
-              <div style={{ marginTop: 40 }}>
-                <ProgressRing percentage={Number(metrics.percentage)} />
-              </div>
-            )}
-
+            
             <div style={{ display: "none" }}>
               <CourseTable
                 data={coursesData[dashboardCourse]}
