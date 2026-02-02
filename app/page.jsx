@@ -5,7 +5,6 @@ import Sidebar from "../components/Sidebar";
 import CourseTable from "../components/CourseTable";
 import { coursesData } from "../data/courses";  
 import ProgressRing from "../components/ProgressRing";
-import CourseBarChart from "../components/CourseBarChart";
 export default function Home() {
   const courses = [
     "Economy",
