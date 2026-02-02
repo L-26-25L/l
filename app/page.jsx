@@ -52,13 +52,23 @@ export default function Home() {
               </select>
             </div>
 
-            {metrics && (
-              <div style={{ display: "flex", gap: 20 }}>
-                <InfoBox label="Current Score" value={metrics.totalObtained} />
-                <InfoBox label="Total Possible" value={metrics.totalPossible} />
-                <InfoBox label="Percentage" value={metrics.percentage + "%"} />
-              </div>
-            )}
+            {/* المقاييس */}
+{metrics && (
+  <div
+    style={{
+      display: "flex",
+      gap: 16,
+      marginTop: 20,
+      flexWrap: "wrap"
+    }}
+  >
+    <InfoBox label="Current Score" value={metrics.totalObtained} />
+    <InfoBox label="Total Possible" value={metrics.totalPossible} />
+    <InfoBox label="Percentage" value={metrics.percentage + "%"} />
+    <InfoBox label="Remaining for A+" value={metrics.remainingForAPlus} />
+    <InfoBox label="Remaining for A" value={metrics.remainingForA} />
+  </div>
+)}
              {metrics && (
   <div style={{ marginTop: 30 }}>
     <div style={{ marginBottom: 8, fontSize: 14 }}>
