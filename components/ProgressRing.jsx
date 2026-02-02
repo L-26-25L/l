@@ -1,5 +1,5 @@
 "use client";
-
+import {PieChart,Pie,Cell} from "recharts";
 export default function ProgressRing({ percentage }) {
   const data = [
     { name: "Completed", value: percentage },
