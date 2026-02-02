@@ -4,7 +4,7 @@ import { useState } from "react";
 import Sidebar from "../components/Sidebar";
 import CourseTable from "../components/CourseTable";
 import { coursesData } from "../data/courses";  
-import ProgressRing from "../components/ProgressRing";
+
 export default function Home() {
   const courses = [
     "Economy",
@@ -67,13 +67,6 @@ export default function Home() {
     <InfoBox label="Percentage" value={metrics.percentage + "%"} />
     <InfoBox label="Remaining for A+" value={metrics.remainingForAPlus} />
     <InfoBox label="Remaining for A" value={metrics.remainingForA} />
-  </div>
-)}
-
-{/* 🔵 خطوة رقم ٣: الشكل البياني */}
-{metrics && (
-  <div style={{ marginTop: 40 }}>
-    <ProgressRing percentage={Number(metrics.percentage)} />
   </div>
 )}
 
