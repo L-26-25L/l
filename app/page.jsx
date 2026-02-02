@@ -1,7 +1,7 @@
-‏"use client";
+"use client";
 
-‏import { useState } from "react";
-‏import Sidebar from "../components/Sidebar";
+import { useState } from "react";
+import Sidebar from "../components/Sidebar";
 ‏import CourseTable from "../components/CourseTable";
 ‏import { coursesData } from "../data/courses";
 
