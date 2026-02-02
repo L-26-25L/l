@@ -1,118 +1,108 @@
-"use client";
+‏"use client";
 
-import { useState } from "react";
-import Sidebar from "../components/Sidebar";
-import CourseTable from "../components/CourseTable";
-import { coursesData } from "../data/courses";  
+‏import { useState } from "react";
+‏import Sidebar from "../components/Sidebar";
+‏import CourseTable from "../components/CourseTable";
+‏import { coursesData } from "../data/courses";
 
-export default function Home() {
-  const courses = [
-    "Economy",
-    "Math",
-    "Administration",
-    "Technology",
-    "Islamic",
-    "Arabica"
+‏export default function Home() {
+‏  const courses = [
+‏    "Economy",
+‏    "Math",
+‏    "Administration",
+‏    "Technology",
+‏    "Islamic",
+‏    "Arabica"
   ];
 
-  const [selectedCourse, setSelectedCourse] = useState(null);
-  const [view, setView] = useState("dashboard");
-  const [metrics, setMetrics] = useState(null);
-  const [dashboardCourse, setDashboardCourse] = useState(courses[0]);
+‏  const [selectedCourse, setSelectedCourse] = useState(null);
+‏  const [view, setView] = useState("dashboard");
+‏  const [metrics, setMetrics] = useState(null);
+‏  const [dashboardCourse, setDashboardCourse] = useState(courses[0]);
 
-  return (
-    <div style={{ display: "flex" }}>
-      <Sidebar
-        courses={courses}
-        onSelectCourse={(course) => {
-          setSelectedCourse(course);
-          setView("course");
+‏  return (
+‏    <div style={{ display: "flex" }}>
+‏      <Sidebar
+‏        courses={courses}
+‏        onSelectCourse={(course) => {
+‏          setSelectedCourse(course);
+‏          setView("course");
         }}
-        onDashboard={() => {
-          setView("dashboard");
-          setSelectedCourse(null);
+‏        onDashboard={() => {
+‏          setView("dashboard");
+‏          setSelectedCourse(null);
         }}
       />
 
-      <div style={{ padding: 40, flex: 1 }}>
-        {/* 🟣 DASHBOARD */}
-        {view === "dashboard" && (
+‏      <div style={{ padding: 40, flex: 1 }}>
+‏        {/* DASHBOARD */}
+‏        {view === "dashboard" && (
           <>
-         <h1>My Grade</h1>
+‏            <h1>My Grade</h1>
 
-{/* اختيار المقرر */}
-<div style={{ marginTop: 20, marginBottom: 20 }}>
-  <select
-    value={dashboardCourse}
-    onChange={(e) => setDashboardCourse(e.target.value)}
-    style={{
-      padding: 8,
-      borderRadius: 6,
-      fontSize: 14
-    }}
-  >
-    {courses.map((course) => (
-      <option key={course} value={course}>
-        {course}
-      </option>
-    ))}
-  </select>
-</div>
+            {/* اختيار المقرر */}
+‏            <div style={{ marginTop: 20, marginBottom: 20 }}>
+‏              <select
+‏                value={dashboardCourse}
+‏                onChange={(e) => setDashboardCourse(e.target.value)}
+‏                style={{ padding: 8, borderRadius: 6 }}
+              >
+‏                {courses.map((course) => (
+‏                  <option key={course} value={course}>
+‏                    {course}
+‏                  </option>
+                ))}
+‏              </select>
+‏            </div>
 
-{/* المقاييس */}
-{metrics && (
-  <div style={{ display: "flex", gap: 20 }}>
-    <InfoBox label="Current Score" value={metrics.totalObtained} />
-    <InfoBox label="Total Possible" value={metrics.totalPossible} />
-    <InfoBox label="Percentage" value={metrics.percentage + "%"} />
-    <InfoBox label="Remaining for A+" value={metrics.remainingForAPlus} />
-    <InfoBox label="Remaining for A" value={metrics.remainingForA} />
-  </div>
-)}
+            {/* المقاييس */}
+‏            {metrics && (
+‏              <div style={{ display: "flex", gap: 20 }}>
+‏                <InfoBox label="Current Score" value={metrics.totalObtained} />
+‏                <InfoBox label="Total Possible" value={metrics.totalPossible} />
+‏                <InfoBox label="Percentage" value={metrics.percentage + "%"} />
+‏                <InfoBox label="Remaining for A+" value={metrics.remainingForAPlus} />
+‏                <InfoBox label="Remaining for A" value={metrics.remainingForA} />
+‏              </div>
+            )}
 
-{/* نحسب المقاييس بدون عرض الجدول */}
-<div style={{ display: "none" }}>
-  <CourseTable
-    data={coursesData[dashboardCourse]}
-    onMetricsChange={setMetrics}
-  />
-</div>
+            {/* حساب المقاييس بدون عرض الجدول */}
+‏            <div style={{ display: "none" }}>
+‏              <CourseTable
+‏                data={coursesData[dashboardCourse]}
+‏                onMetricsChange={setMetrics}
+              />
+‏            </div>
           </>
         )}
 
-        {/* 🟢 COURSE VIEW */}
-        {view === "course" && selectedCourse && (
+‏        {/* COURSE VIEW */}
+‏        {view === "course" && selectedCourse && (
           <>
-            <h1>{selectedCourse}</h1>
-
-            <CourseTable
-              data={coursesData[selectedCourse]}
-              onMetricsChange={setMetrics}
+‏            <h1>{selectedCourse}</h1>
+‏            <CourseTable
+‏              data={coursesData[selectedCourse]}
+‏              onMetricsChange={setMetrics}
             />
           </>
         )}
-      </div>
-    </div>
+‏      </div>
+‏    </div>
   );
 }
 
-/* 🧩 InfoBox */
-function InfoBox({ label, value }) {
-  return (
-    <div
-      style={{
-        background: "#f4f4fa",
-        padding: 15,
-        borderRadius: 10,
-        minWidth: 140
+‏function InfoBox({ label, value }) {
+‏  return (
+‏    <div
+‏      style={{
+‏        background: "#f4f4fa",
+‏        padding: 15,
+‏        borderRadius: 10,
+‏        minWidth: 140
       }}
     >
-      <div style={{ fontSize: 12, opacity: 0.7 }}>
-        {label}
-      </div>
-      <div style={{ fontSize: 20, fontWeight: "bold" }}>
-        {value}
-      </div>
-    </div>
+‏      <div style={{ fontSize: 12, opacity: 0.7 }}>{label}</div>
+‏      <div style={{ fontSize: 20, fontWeight: "bold" }}>{value}</div>
+‏    </div>
   );
 }
