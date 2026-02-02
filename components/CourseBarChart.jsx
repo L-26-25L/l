@@ -1,5 +1,6 @@
 "use client";
-
+ imoprt {BarChart,Bar,XAxis,YAxis,Tooltip,ResponsiveContainer}
+from "recharts";
 export default function CourseBarChart({ data }) {
   if (!data) return null;
 
