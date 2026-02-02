@@ -21,7 +21,7 @@ export default function Home() {
   const [dashboardCourse, setDashboardCourse] = useState(courses[0]);
 
   return (
-    <div style={{ display: "flex" }}>
+    <div style={{ display: "flex",background: "#EAEFEF",minHeight: "100vh" }}>
       <Sidebar
         courses={courses}
         onSelectCourse={(course) => {
@@ -59,7 +59,32 @@ export default function Home() {
                 <InfoBox label="Percentage" value={metrics.percentage + "%"} />
               </div>
             )}
+             {metrics && (
+  <div style={{ marginTop: 30 }}>
+    <div style={{ marginBottom: 8, fontSize: 14 }}>
+      Progress
+    </div>
 
+    <div
+      style={{
+        width: "100%",
+        height: 18,
+        background: "#dcdede",
+        borderRadius: 10,
+        overflow: "hidden"
+      }}
+    >
+      <div
+        style={{
+          width: `${metrics.percentage}%`,
+          height: "100%",
+          background: "#734073",
+          transition: "0.4s"
+        }}
+      />
+    </div>
+  </div>
+)} 
             
             <div style={{ display: "none" }}>
               <CourseTable
