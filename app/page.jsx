@@ -4,7 +4,7 @@ import { useState } from "react";
 import Sidebar from "../components/Sidebar";
 import CourseTable from "../components/CourseTable";
 import { coursesData } from "../data/courses";
-
+import QuizBarChart from "../components/QuizBarChart";
 export default function Home() {
   const courses = [
     "Economy",
@@ -76,6 +76,12 @@ export default function Home() {
       Progress
     </div>
 
+    {metrics && (
+  <div style={{ marginTop: 40 }}>
+    <QuizBarChart rows={coursesData[dashboardCourse]} />
+  </div>
+)}
+    
     <div
       style={{
         width: "100%",
