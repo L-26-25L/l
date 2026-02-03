@@ -31,8 +31,8 @@ export default function QuizBarChart({ rows }) {
           <XAxis dataKey="name" />
           <YAxis />
           <Tooltip />
-          <Bar dataKey="obtained" />
-          <Bar dataKey="total" />
+         <Bar dataKey="obtained" fill="#8e8cad" />
+<Bar dataKey="total" fill="#806185" />
         </BarChart>
       </ResponsiveContainer>
     </div>
