@@ -62,11 +62,12 @@ export default function Home() {
       flexWrap: "wrap"
     }}
   >
-    <InfoBox label="Current Score" value={metrics.totalObtained} />
-    <InfoBox label="Total Possible" value={metrics.totalPossible} />
+    <InfoBox label="Grade Obtained" value={metrics.totalObtained} />
+    <InfoBox label="Total Grade" value={metrics.totalPossible} />
     <InfoBox label="Percentage" value={metrics.percentage + "%"} />
     <InfoBox label="Remaining for A+" value={metrics.remainingForAPlus} />
     <InfoBox label="Remaining for A" value={metrics.remainingForA} />
+    <InfoBox label="Best Quizzes Total" value={metrics.bestQuizzesTotal} />
   </div>
 )}
              {metrics && (
