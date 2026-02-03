@@ -48,7 +48,11 @@ export default function CourseTable({ data, onMetricsChange }) {
     0,
     totalPossible * 0.9 - totalObtained
   ).toFixed(2);
-
+  
+const bestQuizzesTotal = effectiveRows
+  .filter(r => r.type.toLowerCase().includes("quiz"))
+  .reduce((sum, r) => sum + r.obtained, 0);
+  
   // إرسال المقاييس للداشبورد
   useEffect(() => {
     onMetricsChange?.({
@@ -56,7 +60,8 @@ export default function CourseTable({ data, onMetricsChange }) {
       totalPossible,
       percentage,
       remainingForAPlus,
-      remainingForA
+      remainingForA, 
+      bestQuizzesTotal
     });
   }, [
     totalObtained,
