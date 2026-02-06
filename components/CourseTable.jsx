@@ -55,22 +55,26 @@ const bestQuizzesTotal = effectiveRows
   
   // إرسال المقاييس للداشبورد
   useEffect(() => {
-    onMetricsChange?.({
-      totalObtained,
-      totalPossible,
-      percentage,
-      remainingForAPlus,
-      remainingForA, 
-      bestQuizzesTotal
-    });
-  }, [
-    totalObtained,
-    totalPossible,
-    percentage,
-    remainingForAPlus,
-    remainingForA,
-    onMetricsChange
-  ]);
+    
+const bestQuizTotal = quizzes.reduce(
+  (s, q) => s + q.obtained,
+  0
+);
+
+const excludedIndex = lowestQuiz
+  ? rows.findIndex(r => r === lowestQuiz)
+  : -1;
+
+onMetricsChange?.({
+  totalObtained,
+  totalPossible,
+  percentage,
+  remainingForAPlus,
+  remainingForA,
+  bestQuizTotal,
+  quizList: quizzes,
+  excludedIndex
+});
 
   const handleGradeChange = (index, value) => {
     const updated = [...rows];
