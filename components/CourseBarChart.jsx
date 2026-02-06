@@ -1,28 +1,172 @@
 "use client";
- import  {BarChart,Bar,XAxis,YAxis,Tooltip,ResponsiveContainer}
-from "recharts";
-export default function CourseBarChart({ data }) {
-  if (!data) return null;
 
-  const chartData = data.map((item) => ({
-    name: item.type,
-    obtained: item.obtained,
-    total: item.total
-  }));
+import { useState, useEffect } from "react";
+
+export default function CourseTable({ data, onMetricsChange }) {
+  const [rows, setRows] = useState(data);
+  const [excludeQuiz, setExcludeQuiz] = useState(true);
+
+  /* تحديث الصفوف عند تغيير المقرر */
+  useEffect(() => {
+    setRows(data);
+  }, [data]);
+
+  /* ================= QUIZ LOGIC ================= */
+
+  const quizzes = rows.filter((r) =>
+    r.type.toLowerCase().includes("quiz")
+  );
+
+  const lowestQuiz =
+    excludeQuiz && quizzes.length
+      ? quizzes.reduce((min, q) =>
+          q.obtained < min.obtained ? q : min
+        )
+      : null;
+
+  const effectiveRows = rows.filter((r) => r !== lowestQuiz);
+
+  /* ================= CALCULATIONS ================= */
+
+  const totalPossible = effectiveRows.reduce(
+    (s, r) => s + r.total,
+    0
+  );
+
+  const totalObtained = effectiveRows.reduce(
+    (s, r) => s + r.obtained,
+    0
+  );
+
+  const percentage =
+    totalPossible > 0
+      ? ((totalObtained / totalPossible) * 100).toFixed(1)
+      : 0;
+
+  const remainingForAPlus = Math.max(
+    0,
+    totalPossible * 0.95 - totalObtained
+  ).toFixed(1);
+
+  const remainingForA = Math.max(
+    0,
+    totalPossible * 0.9 - totalObtained
+  ).toFixed(1);
+
+  /* ================= QUIZ DATA FOR CHARTS ================= */
+
+  const bestQuizTotal = quizzes.reduce(
+    (s, q) => s + q.obtained,
+    0
+  );
+
+  const excludedIndex = lowestQuiz
+    ? quizzes.findIndex((q) => q === lowestQuiz)
+    : -1;
+
+  /* ================= SEND TO DASHBOARD ================= */
+
+  useEffect(() => {
+    onMetricsChange?.({
+      totalObtained,
+      totalPossible,
+      percentage,
+      remainingForAPlus,
+      remainingForA,
+      bestQuizTotal,
+      quizList: quizzes,
+      excludedIndex
+    });
+  }, [
+    totalObtained,
+    totalPossible,
+    percentage,
+    remainingForAPlus,
+    remainingForA,
+    bestQuizTotal,
+    quizzes,
+    excludedIndex,
+    onMetricsChange
+  ]);
+
+  /* ================= HANDLER ================= */
+
+  const handleChange = (i, val) => {
+    const copy = [...rows];
+    copy[i].obtained = Number(val);
+    setRows(copy);
+  };
+
+  /* ================= UI ================= */
 
   return (
-    <div style={{ width: "100%", height: 300 }}>
-      <h3 style={{ marginBottom: 10 }}>Grades Distribution</h3>
+    <>
+      {quizzes.length > 0 && (
+        <button
+          onClick={() => setExcludeQuiz(!excludeQuiz)}
+          style={{
+            marginBottom: 15,
+            padding: 8,
+            background: "#734073",
+            color: "#fff",
+            border: "none",
+            borderRadius: 6
+          }}
+        >
+          {excludeQuiz
+            ? "❌ Exclude Lowest Quiz"
+            : "✔️ Count All Quizzes"}
+        </button>
+      )}
 
-      <ResponsiveContainer>
-        <BarChart data={chartData}>
-          <XAxis dataKey="name" />
-          <YAxis />
-          <Tooltip />
-          <Bar dataKey="obtained" fill="#734073" radius={[6, 6, 0, 0]} />
-          <Bar dataKey="total" fill="#d1c4d8" radius={[6, 6, 0, 0]} />
-        </BarChart>
-      </ResponsiveContainer>
-    </div>
+      <table style={table}>
+        <thead>
+          <tr>
+            <th style={th}>Assessment Type</th>
+            <th style={th}>Total Grade</th>
+            <th style={th}>Grade Obtained</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {rows.map((row, i) => {
+            const isExcluded = row === lowestQuiz;
+
+            return (
+              <tr
+                key={i}
+                style={{
+                  opacity: isExcluded ? 0.4 : 1,
+                  background: isExcluded ? "#eee" : "white"
+                }}
+              >
+                <td style={td}>{row.type}</td>
+                <td style={td}>{row.total}</td>
+                <td style={td}>
+                  <input
+                    type="number"
+                    value={row.obtained}
+                    onChange={(e) =>
+                      handleChange(i, e.target.value)
+                    }
+                    style={{ width: 70 }}
+                  />
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </>
   );
 }
+
+/* styles */
+const table = {
+  width: "100%",
+  background: "#fff",
+  borderCollapse: "collapse"
+};
+
+const th = { padding: 10, background: "#f0f0f0" };
+const td = { padding: 10, borderBottom: "1px solid #ddd" };
