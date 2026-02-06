@@ -1,148 +1,88 @@
-import { useState, useEffect } from "react";
+"use client";
+
+import { useState, useEffect, useMemo } from "react";
 
 export default function CourseTable({ data, onMetricsChange }) {
   const [rows, setRows] = useState(data);
   const [excludeQuiz, setExcludeQuiz] = useState(true);
 
-  // تحديث الصفوف عند تغيير المقرر
   useEffect(() => {
     setRows(data);
   }, [data]);
 
-  const quizzes = rows.filter((row) =>
-    row.type.toLowerCase().includes("quiz")
-  );
+  // استخدام useMemo هنا يحسن الأداء ويمنع الـ Infinite Loop
+  const quizzes = rows.filter((r) => r.type.toLowerCase().includes("quiz"));
 
   const lowestQuiz =
     excludeQuiz && quizzes.length > 0
-      ? quizzes.reduce((min, q) =>
-          q.obtained < min.obtained ? q : min
-        )
+      ? quizzes.reduce((min, q) => (q.obtained < min.obtained ? q : min))
       : null;
 
-  const effectiveRows = rows.filter(
-    (row) => row !== lowestQuiz
-  );
+  const effectiveRows = rows.filter((r) => r !== lowestQuiz);
 
-  const totalPossible = effectiveRows.reduce(
-    (sum, r) => sum + r.total,
-    0
-  );
+  const totalPossible = effectiveRows.reduce((s, r) => s + r.total, 0);
+  const totalObtained = effectiveRows.reduce((s, r) => s + r.obtained, 0);
 
-  const totalObtained = effectiveRows.reduce(
-    (sum, r) => sum + r.obtained,
-    0
-  );
+  const percentage = totalPossible > 0 ? ((totalObtained / totalPossible) * 100).toFixed(1) : 0;
+  const remainingForAPlus = Math.max(0, totalPossible * 0.95 - totalObtained).toFixed(1);
+  const remainingForA = Math.max(0, totalPossible * 0.9 - totalObtained).toFixed(1);
 
-  const percentage =
-    totalPossible > 0
-      ? ((totalObtained / totalPossible) * 100).toFixed(2)
-      : 0;
+  const bestQuizTotal = quizzes.reduce((s, q) => s + q.obtained, 0) - (lowestQuiz?.obtained || 0);
 
-  const remainingForAPlus = Math.max(
-    0,
-    totalPossible * 0.95 - totalObtained
-  ).toFixed(2);
-
-  const remainingForA = Math.max(
-    0,
-    totalPossible * 0.9 - totalObtained
-  ).toFixed(2);
-  
-const bestQuizzesTotal = effectiveRows
-  .filter(r => r.type.toLowerCase().includes("quiz"))
-  .reduce((sum, r) => sum + r.obtained, 0);
-  
-  // إرسال المقاييس للداشبورد
   useEffect(() => {
+    const excludedIndex = lowestQuiz ? quizzes.findIndex((q) => q === lowestQuiz) : -1;
     
-const bestQuizTotal = quizzes.reduce(
-  (s, q) => s + q.obtained,
-  0
-);
+    onMetricsChange?.({
+      totalObtained,
+      totalPossible,
+      percentage,
+      remainingForAPlus,
+      remainingForA,
+      bestQuizTotal,
+      quizList: quizzes,
+      excludedIndex
+    });
+  // تقليل التبعيات للقيم الأساسية فقط لمنع التكرار غير الضروري
+  }, [totalObtained, totalPossible, excludeQuiz]);
 
-const excludedIndex = lowestQuiz
-  ? rows.findIndex(r => r === lowestQuiz)
-  : -1;
-
-onMetricsChange?.({
-  totalObtained,
-  totalPossible,
-  percentage,
-  remainingForAPlus,
-  remainingForA,
-  bestQuizTotal,
-  quizList: quizzes,
-  excludedIndex
-});
-
-  const handleGradeChange = (index, value) => {
-    const updated = [...rows];
-    updated[index].obtained = Number(value);
-    setRows(updated);
+  const handleChange = (i, val) => {
+    const copy = [...rows];
+    copy[i] = { ...copy[i], obtained: Number(val) };
+    setRows(copy);
   };
 
   return (
     <>
       {quizzes.length > 0 && (
-        <div style={{ marginBottom: 15 }}>
-          <button
-            onClick={() => setExcludeQuiz(!excludeQuiz)}
-            style={{
-              padding: "6px 12px",
-              background: excludeQuiz ? "#734073" : "#aaa",
-              color: "#fff",
-              border: "none",
-              borderRadius: 6,
-              cursor: "pointer"
-            }}
-          >
-            {excludeQuiz
-              ? "❌ Exclude Lowest Quiz"
-              : "✔️ Count All Quizzes"}
-          </button>
-        </div>
+        <button
+          onClick={() => setExcludeQuiz(!excludeQuiz)}
+          style={btnStyle(excludeQuiz)}
+        >
+          {excludeQuiz ? "❌ Exclude Lowest Quiz" : "✔️ Count All Quizzes"}
+        </button>
       )}
 
-      <table
-        style={{
-          width: "100%",
-          borderCollapse: "collapse",
-          background: "#fff",
-          borderRadius: 8,
-          overflow: "hidden"
-        }}
-      >
-        <thead style={{ background: "#e6e6ef" }}>
+      <table style={table}>
+        <thead>
           <tr>
             <th style={th}>Assessment Type</th>
             <th style={th}>Total Grade</th>
             <th style={th}>Grade Obtained</th>
           </tr>
         </thead>
-
         <tbody>
-          {rows.map((row, index) => {
-            const isExcluded = lowestQuiz && row === lowestQuiz;
-
+          {rows.map((row, i) => {
+            const isExcluded = row === lowestQuiz;
             return (
-              <tr
-                key={index}
-                style={{
-                  background: isExcluded ? "#f0f0f0" : "transparent",
-                  opacity: isExcluded ? 0.5 : 1
-                }}
-              >
+              <tr key={i} style={{ opacity: isExcluded ? 0.4 : 1, background: isExcluded ? "#eee" : "white" }}>
                 <td style={td}>{row.type}</td>
                 <td style={td}>{row.total}</td>
                 <td style={td}>
                   <input
                     type="number"
                     value={row.obtained}
-                    onChange={(e) =>
-                      handleGradeChange(index, e.target.value)
-                    }
-                    style={{ width: 80, padding: 5 }}
+                    onChange={(e) => handleChange(i, e.target.value)}
+                    style={{ width: 70 }}
                   />
                 </td>
               </tr>
@@ -154,6 +94,16 @@ onMetricsChange?.({
   );
 }
 
-/* 🔽 Styles */
-const th = { padding: 12, textAlign: "left" };
-const td = { padding: 12, borderBottom: "1px solid #ddd" };
+const btnStyle = (exclude) => ({
+  marginBottom: 15,
+  padding: 8,
+  background: exclude ? "#734073" : "#666",
+  color: "#fff",
+  border: "none",
+  borderRadius: 6,
+  cursor: "pointer"
+});
+
+const table = { width: "100%", background: "#fff", borderCollapse: "collapse" };
+const th = { padding: 10, background: "#f0f0f0", textAlign: "left" };
+const td = { padding: 10, borderBottom: "1px solid #ddd" };
