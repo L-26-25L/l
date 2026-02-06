@@ -1,40 +1,19 @@
-"use client";
+import { BarChart, Bar, XAxis, Tooltip, Cell } from "recharts";
 
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer
-} from "recharts";
-
-export default function QuizBarChart({ rows }) {
-  if (!rows) return null;
-
-  const quizData = rows
-    .filter(r => r.type.toLowerCase().includes("quiz"))
-    .map(r => ({
-      name: r.type,
-      obtained: r.obtained,
-      total: r.total
-    }));
-
-  if (quizData.length === 0) return null;
-
+export default function BestQuizzesChart({ quizzes, excluded }) {
   return (
-    <div style={{ width: "100%", height: 320 }}>
-      <h3 style={{ marginBottom: 10 }}>Quiz Performance</h3>
+    <BarChart width={350} height={240} data={quizzes}>
+      <XAxis dataKey="name" />
+      <Tooltip />
 
-      <ResponsiveContainer>
-        <BarChart data={quizData}>
-          <XAxis dataKey="name" />
-          <YAxis />
-          <Tooltip />
-         <Bar dataKey="obtained" fill="#8e8cad" />
-<Bar dataKey="total" fill="#806185" />
-        </BarChart>
-      </ResponsiveContainer>
-    </div>
+      <Bar dataKey="value">
+        {quizzes.map((q, i) => (
+          <Cell
+            key={i}
+            fill={i === excluded ? "#ddd" : "#734073"}
+          />
+        ))}
+      </Bar>
+    </BarChart>
   );
 }
