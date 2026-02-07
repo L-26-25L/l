@@ -12,8 +12,8 @@ export default function CourseTable({ data, onMetricsChange }) {
   }, [data]);
 
   // الحسابات المنطقية
- const quizzes = rows.filter((r) => 
-  r.type && typeof r.type === 'string' && r.type.toLowerCase().includes("quiz")
+const quizzes = rows.filter((r) => 
+  r && r.type && typeof r.type === 'string' && r.type.toLowerCase().includes("quiz")
 );
 
   const lowestQuiz = useMemo(() => {
