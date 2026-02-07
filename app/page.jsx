@@ -5,7 +5,7 @@ import Sidebar from "../components/Sidebar";
 import CourseTable from "../components/CourseTable";
 import { coursesData } from "../data/courses";
 
-// استيراد المكونات (Dashboard)
+// استيراد المكونات
 import GoalCard from "../components/GoalCard";
 import QuizGauge from "../components/QuizGauge";
 import BestQuizzesChart from "../components/BestQuizzesChart";
@@ -16,51 +16,46 @@ import GradeAnalysisChart from "../components/GradeAnalysisChart";
 
 export default function Home() {
   const courses = Object.keys(coursesData);
-  const [view, setView] = useState("dashboard"); // لتحديد هل نحن في الداشبورد أو في جدول مادة
+  const [view, setView] = useState("dashboard");
   const [metrics, setMetrics] = useState(null);
-  const [selectedCourse, setSelectedCourse] = useState(courses[0]); // المادة المختارة للجدول
-  const [dashboardCourse, setDashboardCourse] = useState(courses[0]); // المادة المختارة للداشبورد (التصفية)
+  const [selectedCourse, setSelectedCourse] = useState(courses[0]);
+  const [dashboardCourse, setDashboardCourse] = useState(courses[0]);
 
   const handleMetricsChange = useCallback((newMetrics) => {
     setMetrics(newMetrics);
   }, []);
 
-  // دالة تُستدعى عند الضغط على أي مادة في الـ Sidebar
   const handleSidebarClick = (courseName) => {
-    setSelectedCourse(courseName); // نحدد المادة التي ضغطتِ عليها
-    setView("course"); // ننتقل فوراً لعرض الجدول
+    setSelectedCourse(courseName);
+    setView("course");
   };
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: "#f1f5f9" }}>
-      {/* تمرير الدالة للـ Sidebar */}
+    <div style={{ display: "flex", minHeight: "100vh", background: "#f8fafc", fontFamily: 'sans-serif' }}>
       <Sidebar 
         courses={courses} 
         onSelectCourse={handleSidebarClick} 
         onDashboard={() => setView("dashboard")} 
       />
 
-      <div style={{ flex: 1, padding: "20px", overflowY: "auto" }}>
+      <div style={{ flex: 1, padding: "25px", overflowY: "auto" }}>
         
-        {/* --- حالة الداشبورد (My Grade Dashboard) --- */}
         {view === "dashboard" && (
-          <div style={{ maxWidth: "1300px", margin: "0 auto" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
-              <h1 style={{ fontSize: "20px", fontWeight: "700", color: "#1e293b" }}>My Grade Dashboard</h1>
-              {/* زر التصفية واختيار المادة داخل الداشبورد */}
+          <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "25px" }}>
+              <h1 style={{ fontSize: "18px", fontWeight: "700", color: "#0f172a" }}>My Grade Dashboard</h1>
               <select 
                 value={dashboardCourse} 
                 onChange={(e) => setDashboardCourse(e.target.value)}
-                style={{ padding: "6px 12px", borderRadius: "8px", border: "1px solid #e2e8f0" }}
+                style={{ padding: "5px 10px", borderRadius: "6px", border: "1px solid #cbd5e1", fontSize: "13px" }}
               >
                 {courses.map(c => <option key={c} value={c}>{c}</option>)}
               </select>
             </div>
 
-            {/* حسابات مخفية للداشبورد فقط */}
             <div style={{ display: "none" }}>
               <CourseTable 
-                key={`dash-${dashboardCourse}`} 
+                key={`calc-${dashboardCourse}`} 
                 data={coursesData[dashboardCourse]} 
                 onMetricsChange={handleMetricsChange} 
               />
@@ -68,67 +63,101 @@ export default function Home() {
 
             {metrics && (
               <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-                {/* الرسوم البيانية الأربعة العلوية */}
-                <div style={{ display: "grid", gridTemplateColumns: "160px 1.2fr 1fr 1.2fr", gap: "12px" }}>
-                  <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-                    <div style={cardStyle}><GoalCard remaining={metrics.remainingForAPlus} /></div>
-                    <div style={cardStyle}>
+                
+                {/* الصف العلوي - مقاسات أصغر ومسافات واضحة */}
+                <div style={{ 
+                  display: "grid", 
+                  gridTemplateColumns: "150px 1.2fr 0.9fr 1.1fr", 
+                  gap: "20px", // مسافة بين الكروت
+                  alignItems: "stretch" 
+                }}>
+                  
+                  <div style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
+                    <div style={smallCardStyle}><GoalCard remaining={metrics.remainingForAPlus} /></div>
+                    <div style={smallCardStyle}>
                       <p style={labelStyle}>Total best quizzes</p>
-                      <QuizGauge value={metrics.bestQuizTotal} max={metrics.quizPossibleTotal} />
+                      <div style={{width: '100%', height: '80px'}}><QuizGauge value={metrics.bestQuizTotal} max={metrics.quizPossibleTotal} /></div>
                     </div>
                   </div>
-                  <div style={cardStyle}>
+
+                  <div style={smallCardStyle}>
                     <p style={labelStyle}>Best 4 Quizzes</p>
-                    <BestQuizzesChart quizzes={metrics.quizList} excluded={metrics.excludedIndex} />
+                    <div style={{width: '100%', height: '140px'}}><BestQuizzesChart quizzes={metrics.quizList} excluded={metrics.excludedIndex} /></div>
                   </div>
-                  <div style={cardStyle}>
+
+                  <div style={smallCardStyle}>
                     <p style={labelStyle}>Total course grade</p>
-                    <CoursePie obtained={metrics.totalObtained} total={100} />
+                    <div style={{width: '100%', height: '140px'}}><CoursePie obtained={metrics.totalObtained} total={100} /></div>
                   </div>
-                  <div style={cardStyle}>
+
+                  <div style={smallCardStyle}>
                     <p style={labelStyle}>Distribution of grades</p>
-                    <DistributionDonut rows={coursesData[dashboardCourse]} />
+                    <div style={{width: '100%', height: '140px'}}><DistributionDonut rows={coursesData[dashboardCourse]} /></div>
                   </div>
                 </div>
 
-                {/* الرسوم البيانية السفلية */}
-                <div style={{ display: "grid", gridTemplateColumns: "1.5fr 1fr", gap: "12px" }}>
-                  <div style={cardStyle}>
+                {/* الصف السفلي - تحليل ومستويات */}
+                <div style={{ display: "grid", gridTemplateColumns: "1.6fr 1fr", gap: "20px" }}>
+                  <div style={smallCardStyle}>
                      <p style={labelStyle}>Grade Analysis</p>
-                     <GradeAnalysisChart data={coursesData[dashboardCourse].map(i => ({ type: i.type, obtained: i.obtained }))} />
+                     <div style={{width: '100%', height: '180px'}}>
+                        <GradeAnalysisChart data={coursesData[dashboardCourse].map(i => ({ type: i.type, obtained: i.obtained }))} />
+                     </div>
                   </div>
-                  <div style={cardStyle}>
+                  <div style={smallCardStyle}>
                     <p style={labelStyle}>Student level in courses</p>
-                    <CourseBarChart data={Object.keys(coursesData).map(name => {
-                      const rows = coursesData[name];
-                      const totalObtained = rows.reduce((s, r) => s + (Number(r.obtained) || 0), 0);
-                      return { name: name, grade: (totalObtained / 100) * 50 };
-                    })} />
+                    <div style={{width: '100%', height: '180px'}}>
+                        <CourseBarChart data={Object.keys(coursesData).map(name => {
+                          const rows = coursesData[name];
+                          const totalObtained = rows.reduce((s, r) => s + (Number(r.obtained) || 0), 0);
+                          return { name: name, grade: (totalObtained / 100) * 50 };
+                        })} />
+                    </div>
                   </div>
                 </div>
+
               </div>
             )}
           </div>
         )}
 
-        {/* --- حالة جدول المقرر المستقل (عند الضغط من الـ Sidebar) --- */}
         {view === "course" && (
-          <div>
-            <h2 style={{ marginBottom: "20px", color: "#1e293b" }}>{selectedCourse} - Detailed Grades</h2>
-            <div style={cardStyle}>
+          <div style={{ maxWidth: "1000px", margin: "0 auto" }}>
+            <h2 style={{ marginBottom: "20px", fontSize: "18px", color: "#1e293b" }}>{selectedCourse} Details</h2>
+            <div style={{ ...smallCardStyle, padding: '20px', alignItems: 'flex-start' }}>
                <CourseTable 
-                 key={selectedCourse} // لضمان تحديث الجدول فوراً عند تغيير المادة
+                 key={selectedCourse} 
                  data={coursesData[selectedCourse]} 
-                 onMetricsChange={() => {}} // لا نحتاج تحديث الداشبورد هنا
+                 onMetricsChange={() => {}} 
                />
             </div>
           </div>
         )}
-
       </div>
     </div>
   );
 }
 
-const cardStyle = { background: "#fff", borderRadius: "12px", padding: "15px", boxShadow: "0 2px 10px rgba(0,0,0,0.03)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", width: "100%" };
-const labelStyle = { fontSize: "12px", color: "#64748b", marginBottom: "10px", fontWeight: "600", textAlign: "center" };
+// تصميم الكروت الصغير والمحدد
+const smallCardStyle = {
+  background: "#ffffff",
+  borderRadius: "10px",
+  padding: "12px",
+  boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  justifyContent: "center",
+  width: "100%",
+  minHeight: "120px", // يضمن وجود مساحة للرسم
+  overflow: "hidden"
+};
+
+const labelStyle = {
+  fontSize: "11px",
+  color: "#64748b",
+  marginBottom: "8px",
+  fontWeight: "600",
+  textTransform: "uppercase",
+  letterSpacing: "0.5px"
+};
