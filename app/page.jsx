@@ -12,6 +12,7 @@ import BestQuizzesChart from "../components/BestQuizzesChart";
 import CoursePie from "../components/CoursePie";
 import DistributionDonut from "../components/DistributionDonut";
 import CourseBarChart from "../components/CourseBarChart"; 
+import GradeAnalysisChart from "../components/GradeAnalysisChart"; // تأكد من وجود الملف
 
 export default function Home() {
   const courses = Object.keys(coursesData);
@@ -46,6 +47,7 @@ export default function Home() {
               </select>
             </div>
 
+            {/* الحسابات المخفية لتغذية البيانات */}
             <div style={{ display: "none" }}>
               <CourseTable data={coursesData[dashboardCourse]} onMetricsChange={handleMetricsChange} />
             </div>
@@ -61,7 +63,7 @@ export default function Home() {
                   alignItems: "stretch" 
                 }}>
                   
-                  {/* 1. الهدف والقياس (يسار) */}
+                  {/* 1. العمود الأيسر: الهدف + القياس */}
                   <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
                     <div style={cardStyle}><GoalCard remaining={metrics.remainingForAPlus} /></div>
                     <div style={cardStyle}>
@@ -89,34 +91,34 @@ export default function Home() {
                   </div>
                 </div>
 
-                {/* الصف السفلي - التحليلات والمستويات */}
+                {/* الصف السفلي - التحليلات ومستويات المواد */}
                 <div style={{ display: "grid", gridTemplateColumns: "1.5fr 1fr", gap: "12px" }}>
+                  
+                  {/* الرسم المنحني الأزرق */}
                   <div style={cardStyle}>
                      <p style={labelStyle}>Grade Analysis</p>
-                     <div style={{height: "200px", width: "100%", background: "#f8fafc", borderRadius: "8px", display: "flex", alignItems: "center", justifyContent: "center", color: "#94a3b8"}}>
-                        {/* سنضع هنا كود الـ Area Chart لاحقاً */}
-                        Area Chart Loading...
-                     </div>
+                     <GradeAnalysisChart data={[
+                        { name: "Week 1", grade: 10 },
+                        { name: "Week 4", grade: 25 },
+                        { name: "Week 8", grade: 38 },
+                        { name: "Week 12", grade: metrics.totalObtained },
+                     ]} />
                   </div>
-                 {/* داخل صفحة page.jsx ابحثي عن CourseBarChart واستبدليه بهذا */}
-<div style={cardStyle}>
-  <p style={labelStyle}>Student level in courses</p>
-  <CourseBarChart data={Object.keys(coursesData).map(courseName => {
-    const data = coursesData[courseName];
-    // حساب إجمالي الدرجات التي حصلتِ عليها في هذه المادة
-    const totalObtained = data.reduce((sum, row) => sum + (Number(row.obtained) || 0), 0);
-    // حساب إجمالي الدرجات الممكنة للمادة (عادة 100)
-    const totalPossible = data.reduce((sum, row) => sum + (Number(row.total) || 0), 0);
-    
-    // تحويل النسبة لمقياس 50 (كما في تصميم الصورة)
-    const gradeScale = totalPossible > 0 ? (totalObtained / totalPossible) * 50 : 0;
-    
-    return {
-      name: courseName,
-      grade: parseFloat(gradeScale.toFixed(1))
-    };
-  })} />
-</div>
+
+                  {/* أعمدة مستويات المواد (ديناميكية) */}
+                  <div style={cardStyle}>
+                    <p style={labelStyle}>Student level in courses</p>
+                    <CourseBarChart data={Object.keys(coursesData).map(courseName => {
+                      const data = coursesData[courseName];
+                      const totalObtained = data.reduce((sum, row) => sum + (Number(row.obtained) || 0), 0);
+                      const totalPossible = data.reduce((sum, row) => sum + (Number(row.total) || 0), 0);
+                      const gradeScale = totalPossible > 0 ? (totalObtained / totalPossible) * 50 : 0;
+                      return {
+                        name: courseName,
+                        grade: parseFloat(gradeScale.toFixed(1))
+                      };
+                    })} />
+                  </div>
                 </div>
 
               </div>
@@ -134,6 +136,7 @@ export default function Home() {
   );
 }
 
+// التنسيقات الثابتة
 const cardStyle = {
   background: "#ffffff",
   borderRadius: "12px",
