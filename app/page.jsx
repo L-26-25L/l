@@ -97,12 +97,10 @@ export default function Home() {
                   {/* الرسم المنحني الأزرق */}
                   <div style={cardStyle}>
                      <p style={labelStyle}>Grade Analysis</p>
-                     <GradeAnalysisChart data={[
-                        { name: "Week 1", grade: 10 },
-                        { name: "Week 4", grade: 25 },
-                        { name: "Week 8", grade: 38 },
-                        { name: "Week 12", grade: metrics.totalObtained },
-                     ]} />
+                     <GradeAnalysisChart data={metrics.quizList.map(q => ({
+    type: q.type,      // نوع التقييم للمحور X
+    obtained: q.obtained // الدرجة للمحور Y
+}))} />
                   </div>
 
                   {/* أعمدة مستويات المواد (ديناميكية) */}
