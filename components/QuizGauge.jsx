@@ -1,25 +1,23 @@
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
 
 export default function QuizGauge({ value, max }) {
-  // الحساب يعتمد على البيانات القادمة من الجدول مباشرة
   const data = [
-    { value: Number(value) }, // درجاتي التي حصلت عليها
-    { value: Math.max(0, Number(max) - Number(value)) }, // المتبقي للوصول للدرجة الكاملة
+    { value: Number(value) },
+    { value: Math.max(0, Number(max) - Number(value)) },
   ];
-  
-  const COLORS = ["#1a3a5a", "#f1f2f6"]; // اللون الغامق لدرجتك، والفاتح للمتبقي
+  const COLORS = ["#1a3a5a", "#f1f2f6"]; 
 
   return (
-    <div style={{ width: "100%", height: 140, position: "relative" }}>
+    <div style={{ width: "100%", height: 100, position: "relative" }}> {/* قللنا الارتفاع لـ 100 */}
       <ResponsiveContainer width="100%" height="100%">
         <PieChart>
           <Pie
             data={data}
             cx="50%"
-            cy="80%" 
-            startAngle={180} // بداية نصف الدائرة من اليسار
-            endAngle={0}     // نهاية نصف الدائرة في اليمين
-            innerRadius="70%"
+            cy="100%"  // نزلنا المركز للقاع لتبدو نصف دائرة
+            startAngle={180}
+            endAngle={0}
+            innerRadius="75%"
             outerRadius="100%"
             dataKey="value"
             stroke="none"
@@ -31,17 +29,12 @@ export default function QuizGauge({ value, max }) {
         </PieChart>
       </ResponsiveContainer>
       
-      {/* إظهار الأرقام الحقيقية في المنتصف كما في الصورة بالضبط */}
       <div style={{ 
-        position: "absolute", bottom: "15%", left: "50%", 
+        position: "absolute", bottom: "-5px", left: "50%", 
         transform: "translateX(-50%)", textAlign: "center" 
       }}>
-        <div style={{ fontSize: "24px", fontWeight: "bold", color: "#1a3a5a" }}>
-          {value}
-        </div>
-        <div style={{ fontSize: "10px", color: "#94a3b8" }}>
-          0 / {max} {/* هنا يظهر إجمالي درجات أعمال الترم (الكويزات) تلقائياً */}
-        </div>
+        <div style={{ fontSize: "20px", fontWeight: "bold", color: "#1a3a5a" }}>{value}</div>
+        <div style={{ fontSize: "10px", color: "#94a3b8" }}>{max}</div>
       </div>
     </div>
   );
