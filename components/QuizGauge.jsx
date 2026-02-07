@@ -8,7 +8,7 @@ export default function QuizGauge({ value, max }) {
   const COLORS = ["#1a3a5a", "#f1f2f6"]; 
 
   return (
-    <div style={{ width: "100%", height: 100, position: "relative" }}> {/* قللنا الارتفاع لـ 100 */}
+    <div style={{ width: "100%", height: 120, position: "relative" }}> {/* قللنا الارتفاع لـ 100 */}
       <ResponsiveContainer width="100%" height="100%">
         <PieChart>
           <Pie
@@ -28,7 +28,7 @@ export default function QuizGauge({ value, max }) {
           </Pie>
         </PieChart>
       </ResponsiveContainer>
-      
+    </div> );
       <div style={{ 
         position: "absolute", bottom: "-5px", left: "50%", 
         transform: "translateX(-50%)", textAlign: "center" 
