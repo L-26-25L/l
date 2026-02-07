@@ -7,17 +7,19 @@ export default function GradeAnalysisChart({ data }) {
         <AreaChart data={data} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
           <defs>
             <linearGradient id="colorGrade" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#8884d8" stopOpacity={0.8}/>
-              <stop offset="95%" stopColor="#8884d8" stopOpacity={0}/>
+              <stop offset="5%" stopColor="#1a3a5a" stopOpacity={0.3}/>
+              <stop offset="95%" stopColor="#1a3a5a" stopOpacity={0}/>
             </linearGradient>
           </defs>
-          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
-          <XAxis dataKey="name" tick={{fontSize: 10}} axisLine={false} tickLine={false} />
-          <YAxis tick={{fontSize: 10}} axisLine={false} tickLine={false} hide />
+          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+          {/* المحور X هو نوع التقييم Assessment Type */}
+          <XAxis dataKey="type" tick={{fontSize: 10}} axisLine={false} tickLine={false} />
+          {/* المحور Y هو الدرجة */}
+          <YAxis hide domain={[0, 'auto']} /> 
           <Tooltip />
           <Area 
             type="monotone" 
-            dataKey="grade" 
+            dataKey="obtained" 
             stroke="#1a3a5a" 
             fillOpacity={1} 
             fill="url(#colorGrade)" 
