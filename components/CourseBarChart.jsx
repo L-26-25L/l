@@ -1,172 +1,53 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 
-export default function CourseTable({ data, onMetricsChange }) {
-  const [rows, setRows] = useState(data);
-  const [excludeQuiz, setExcludeQuiz] = useState(true);
+export default function CourseBarChart({ data }) {
+  // ألوان هادئة واحترافية كما في الصورة الأصلية
+  const colors = ["#6c5ce7", "#74b9ff", "#a29bfe", "#00cec9"];
 
-  /* تحديث الصفوف عند تغيير المقرر */
-  useEffect(() => {
-    setRows(data);
-  }, [data]);
-
-  /* ================= QUIZ LOGIC ================= */
-
-  const quizzes = rows.filter((r) =>
-    r.type.toLowerCase().includes("quiz")
-  );
-
-  const lowestQuiz =
-    excludeQuiz && quizzes.length
-      ? quizzes.reduce((min, q) =>
-          q.obtained < min.obtained ? q : min
-        )
-      : null;
-
-  const effectiveRows = rows.filter((r) => r !== lowestQuiz);
-
-  /* ================= CALCULATIONS ================= */
-
-  const totalPossible = effectiveRows.reduce(
-    (s, r) => s + r.total,
-    0
-  );
-
-  const totalObtained = effectiveRows.reduce(
-    (s, r) => s + r.obtained,
-    0
-  );
-
-  const percentage =
-    totalPossible > 0
-      ? ((totalObtained / totalPossible) * 100).toFixed(1)
-      : 0;
-
-  const remainingForAPlus = Math.max(
-    0,
-    totalPossible * 0.95 - totalObtained
-  ).toFixed(1);
-
-  const remainingForA = Math.max(
-    0,
-    totalPossible * 0.9 - totalObtained
-  ).toFixed(1);
-
-  /* ================= QUIZ DATA FOR CHARTS ================= */
-
-  const bestQuizTotal = quizzes.reduce(
-    (s, q) => s + q.obtained,
-    0
-  );
-
-  const excludedIndex = lowestQuiz
-    ? quizzes.findIndex((q) => q === lowestQuiz)
-    : -1;
-
-  /* ================= SEND TO DASHBOARD ================= */
-
-  useEffect(() => {
-    onMetricsChange?.({
-      totalObtained,
-      totalPossible,
-      percentage,
-      remainingForAPlus,
-      remainingForA,
-      bestQuizTotal,
-      quizList: quizzes,
-      excludedIndex
-    });
-  }, [
-    totalObtained,
-    totalPossible,
-    percentage,
-    remainingForAPlus,
-    remainingForA,
-    bestQuizTotal,
-    quizzes,
-    excludedIndex,
-    onMetricsChange
-  ]);
-
-  /* ================= HANDLER ================= */
-
-  const handleChange = (i, val) => {
-    const copy = [...rows];
-    copy[i].obtained = Number(val);
-    setRows(copy);
-  };
-
-  /* ================= UI ================= */
+  // نستخدم "حماية" للبيانات لضمان عدم ظهور أخطاء undefined
+  const chartData = data || [
+    { name: "MATH", grade: 0 },
+    { name: "ECONOMY", grade: 0 },
+    { name: "MARKETING", grade: 0 },
+    { name: "TECH", grade: 0 },
+  ];
 
   return (
-    <>
-      {quizzes.length > 0 && (
-        <button
-          onClick={() => setExcludeQuiz(!excludeQuiz)}
-          style={{
-            marginBottom: 15,
-            padding: 8,
-            background: "#734073",
-            color: "#fff",
-            border: "none",
-            borderRadius: 6
-          }}
+    <div style={{ width: '100%', height: 220 }}>
+      <ResponsiveContainer width="100%" height="100%">
+        <BarChart
+          layout="vertical"
+          data={chartData}
+          margin={{ top: 5, right: 30, left: 40, bottom: 5 }}
         >
-          {excludeQuiz
-            ? "❌ Exclude Lowest Quiz"
-            : "✔️ Count All Quizzes"}
-        </button>
-      )}
-
-      <table style={table}>
-        <thead>
-          <tr>
-            <th style={th}>Assessment Type</th>
-            <th style={th}>Total Grade</th>
-            <th style={th}>Grade Obtained</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          {rows.map((row, i) => {
-            const isExcluded = row === lowestQuiz;
-
-            return (
-              <tr
-                key={i}
-                style={{
-                  opacity: isExcluded ? 0.4 : 1,
-                  background: isExcluded ? "#eee" : "white"
-                }}
-              >
-                <td style={td}>{row.type}</td>
-                <td style={td}>{row.total}</td>
-                <td style={td}>
-                  <input
-                    type="number"
-                    value={row.obtained}
-                    onChange={(e) =>
-                      handleChange(i, e.target.value)
-                    }
-                    style={{ width: 70 }}
-                  />
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-    </>
+          <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#f0f0f0" />
+          {/* المحور الأفقي يمثل الدرجات من 0 إلى 50 كما في الصورة */}
+          <XAxis type="number" domain={[0, 50]} hide /> 
+          <YAxis 
+            dataKey="name" 
+            type="category" 
+            axisLine={false} 
+            tickLine={false} 
+            style={{ fontSize: '11px', fontWeight: 'bold', fill: '#64748b' }}
+          />
+          <Tooltip cursor={{fill: 'transparent'}} />
+          <Bar dataKey="grade" barSize={10} radius={[0, 10, 10, 0]}>
+            {chartData.map((entry, index) => (
+              <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
+            ))}
+          </Bar>
+        </BarChart>
+      </ResponsiveContainer>
+      
+      {/* مسطرة الأرقام السفلية (اختياري) */}
+      <div style={{ display: 'flex', justifyContent: 'space-around', fontSize: '10px', color: '#94a3b8', paddingLeft: '40px' }}>
+        <span>35</span>
+        <span>40</span>
+        <span>45</span>
+        <span>50</span>
+      </div>
+    </div>
   );
 }
-
-/* styles */
-const table = {
-  width: "100%",
-  background: "#fff",
-  borderCollapse: "collapse"
-};
-
-const th = { padding: 10, background: "#f0f0f0" };
-const td = { padding: 10, borderBottom: "1px solid #ddd" };
