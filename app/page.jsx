@@ -5,7 +5,7 @@ import Sidebar from "../components/Sidebar";
 import CourseTable from "../components/CourseTable";
 import { coursesData } from "../data/courses";
 
-// استيراد المكونات التي أرسلتيها
+// استيراد المكونات (Dashboard)
 import GoalCard from "../components/GoalCard";
 import QuizGauge from "../components/QuizGauge";
 import BestQuizzesChart from "../components/BestQuizzesChart";
@@ -16,28 +16,38 @@ import GradeAnalysisChart from "../components/GradeAnalysisChart";
 
 export default function Home() {
   const courses = Object.keys(coursesData);
-  const [view, setView] = useState("dashboard");
+  const [view, setView] = useState("dashboard"); // لتحديد هل نحن في الداشبورد أو في جدول مادة
   const [metrics, setMetrics] = useState(null);
-  const [dashboardCourse, setDashboardCourse] = useState(courses[0]);
+  const [selectedCourse, setSelectedCourse] = useState(courses[0]); // المادة المختارة للجدول
+  const [dashboardCourse, setDashboardCourse] = useState(courses[0]); // المادة المختارة للداشبورد (التصفية)
 
   const handleMetricsChange = useCallback((newMetrics) => {
     setMetrics(newMetrics);
   }, []);
 
+  // دالة تُستدعى عند الضغط على أي مادة في الـ Sidebar
+  const handleSidebarClick = (courseName) => {
+    setSelectedCourse(courseName); // نحدد المادة التي ضغطتِ عليها
+    setView("course"); // ننتقل فوراً لعرض الجدول
+  };
+
   return (
     <div style={{ display: "flex", minHeight: "100vh", background: "#f1f5f9" }}>
+      {/* تمرير الدالة للـ Sidebar */}
       <Sidebar 
         courses={courses} 
-        onSelectCourse={() => setView("course")} 
+        onSelectCourse={handleSidebarClick} 
         onDashboard={() => setView("dashboard")} 
       />
 
       <div style={{ flex: 1, padding: "20px", overflowY: "auto" }}>
+        
+        {/* --- حالة الداشبورد (My Grade Dashboard) --- */}
         {view === "dashboard" && (
           <div style={{ maxWidth: "1300px", margin: "0 auto" }}>
-            
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
               <h1 style={{ fontSize: "20px", fontWeight: "700", color: "#1e293b" }}>My Grade Dashboard</h1>
+              {/* زر التصفية واختيار المادة داخل الداشبورد */}
               <select 
                 value={dashboardCourse} 
                 onChange={(e) => setDashboardCourse(e.target.value)}
@@ -47,22 +57,19 @@ export default function Home() {
               </select>
             </div>
 
-            {/* الحسابات المخفية */}
+            {/* حسابات مخفية للداشبورد فقط */}
             <div style={{ display: "none" }}>
-              <CourseTable data={coursesData[dashboardCourse]} onMetricsChange={handleMetricsChange} />
+              <CourseTable 
+                key={`dash-${dashboardCourse}`} 
+                data={coursesData[dashboardCourse]} 
+                onMetricsChange={handleMetricsChange} 
+              />
             </div>
 
             {metrics && (
               <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-                
-                {/* الصف العلوي - المربعات الأربعة */}
-                <div style={{ 
-                  display: "grid", 
-                  gridTemplateColumns: "160px 1.2fr 1fr 1.2fr", 
-                  gap: "12px", 
-                  alignItems: "stretch" 
-                }}>
-                  
+                {/* الرسوم البيانية الأربعة العلوية */}
+                <div style={{ display: "grid", gridTemplateColumns: "160px 1.2fr 1fr 1.2fr", gap: "12px" }}>
                   <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
                     <div style={cardStyle}><GoalCard remaining={metrics.remainingForAPlus} /></div>
                     <div style={cardStyle}>
@@ -70,79 +77,58 @@ export default function Home() {
                       <QuizGauge value={metrics.bestQuizTotal} max={metrics.quizPossibleTotal} />
                     </div>
                   </div>
-
                   <div style={cardStyle}>
                     <p style={labelStyle}>Best 4 Quizzes</p>
                     <BestQuizzesChart quizzes={metrics.quizList} excluded={metrics.excludedIndex} />
                   </div>
-
                   <div style={cardStyle}>
                     <p style={labelStyle}>Total course grade</p>
                     <CoursePie obtained={metrics.totalObtained} total={100} />
                   </div>
-
                   <div style={cardStyle}>
                     <p style={labelStyle}>Distribution of grades</p>
                     <DistributionDonut rows={coursesData[dashboardCourse]} />
                   </div>
                 </div>
 
-                {/* الصف السفلي - التحليلات والمستويات */}
+                {/* الرسوم البيانية السفلية */}
                 <div style={{ display: "grid", gridTemplateColumns: "1.5fr 1fr", gap: "12px" }}>
                   <div style={cardStyle}>
                      <p style={labelStyle}>Grade Analysis</p>
-                     {/* هنا نربط المنحنى بالبيانات الحقيقية للمادة المختارة */}
-                     <GradeAnalysisChart data={coursesData[dashboardCourse].map(item => ({
-                        type: item.type,
-                        obtained: item.obtained
-                     }))} />
+                     <GradeAnalysisChart data={coursesData[dashboardCourse].map(i => ({ type: i.type, obtained: i.obtained }))} />
                   </div>
-
                   <div style={cardStyle}>
                     <p style={labelStyle}>Student level in courses</p>
-                    <CourseBarChart data={Object.keys(coursesData).map(courseName => {
-                      const courseRows = coursesData[courseName];
-                      const totalObtained = courseRows.reduce((sum, row) => sum + (Number(row.obtained) || 0), 0);
-                      const totalPossible = courseRows.reduce((sum, row) => sum + (Number(row.total) || 0), 0);
-                      const gradeScale = totalPossible > 0 ? (totalObtained / totalPossible) * 50 : 0;
-                      return { name: courseName, grade: parseFloat(gradeScale.toFixed(1)) };
+                    <CourseBarChart data={Object.keys(coursesData).map(name => {
+                      const rows = coursesData[name];
+                      const totalObtained = rows.reduce((s, r) => s + (Number(r.obtained) || 0), 0);
+                      return { name: name, grade: (totalObtained / 100) * 50 };
                     })} />
                   </div>
                 </div>
-
               </div>
             )}
           </div>
         )}
 
+        {/* --- حالة جدول المقرر المستقل (عند الضغط من الـ Sidebar) --- */}
         {view === "course" && (
-          <div style={cardStyle}>
-             <CourseTable data={coursesData[dashboardCourse]} onMetricsChange={handleMetricsChange} />
+          <div>
+            <h2 style={{ marginBottom: "20px", color: "#1e293b" }}>{selectedCourse} - Detailed Grades</h2>
+            <div style={cardStyle}>
+               <CourseTable 
+                 key={selectedCourse} // لضمان تحديث الجدول فوراً عند تغيير المادة
+                 data={coursesData[selectedCourse]} 
+                 onMetricsChange={() => {}} // لا نحتاج تحديث الداشبورد هنا
+               />
+            </div>
           </div>
         )}
+
       </div>
     </div>
   );
 }
 
-const cardStyle = {
-  background: "#ffffff",
-  borderRadius: "12px",
-  padding: "15px",
-  boxShadow: "0 2px 10px rgba(0,0,0,0.03)",
-  display: "flex",
-  flexDirection: "column",
-  alignItems: "center",
-  justifyContent: "center",
-  width: "100%",
-  minHeight: "160px"
-};
-
-const labelStyle = {
-  fontSize: "12px",
-  color: "#64748b",
-  marginBottom: "10px",
-  fontWeight: "600",
-  textAlign: "center",
-  width: "100%"
-};
+const cardStyle = { background: "#fff", borderRadius: "12px", padding: "15px", boxShadow: "0 2px 10px rgba(0,0,0,0.03)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", width: "100%" };
+const labelStyle = { fontSize: "12px", color: "#64748b", marginBottom: "10px", fontWeight: "600", textAlign: "center" };
