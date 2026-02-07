@@ -2,9 +2,10 @@
 
 import { useState, useCallback } from "react";
 import Sidebar from "../components/Sidebar";
-import CourseTable from "../components/CourseTable";
+import CourseTable from "../components/CourseTable"; // تأكد من المسار الصحيح
 import { coursesData } from "../data/courses";
 
+// استيراد المكونات المعدلة
 import GoalCard from "../components/GoalCard";
 import QuizGauge from "../components/QuizGauge";
 import BestQuizzesChart from "../components/BestQuizzesChart";
@@ -12,79 +13,113 @@ import CoursePie from "../components/CoursePie";
 import DistributionDonut from "../components/DistributionDonut";
 
 export default function Home() {
-  const courses = ["Economy", "Math", "Administration", "Technology", "Islamic", "Arabica"];
-
-  const [selectedCourse, setSelectedCourse] = useState(null);
+  const courses = Object.keys(coursesData);
   const [view, setView] = useState("dashboard");
   const [metrics, setMetrics] = useState(null);
   const [dashboardCourse, setDashboardCourse] = useState(courses[0]);
 
-  // استخدام useCallback لمنع الـ Infinite Loop
   const handleMetricsChange = useCallback((newMetrics) => {
     setMetrics(newMetrics);
   }, []);
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: "#EAEFEF" }}>
-      <Sidebar
-        courses={courses}
-        onSelectCourse={(course) => {
-          setSelectedCourse(course);
-          setView("course");
-        }}
-        onDashboard={() => {
-          setView("dashboard");
-          setSelectedCourse(null);
-        }}
+    <div style={{ display: "flex", minHeight: "100vh", background: "#f8fafc" }}>
+      <Sidebar 
+        courses={courses} 
+        onSelectCourse={() => setView("course")} 
+        onDashboard={() => setView("dashboard")} 
       />
 
-      <div style={{ padding: 40, flex: 1 }}>
+      <div style={{ flex: 1, padding: "30px", overflow: "hidden" }}>
         {view === "dashboard" && (
-          <>
-            <h1>My Grade Dashboard</h1>
-            <select
-              value={dashboardCourse}
-              onChange={(e) => setDashboardCourse(e.target.value)}
-              style={{ padding: "8px 12px", borderRadius: 6, marginBottom: 30, border: "1px solid #ccc" }}
-            >
-              {courses.map((c) => (
-                <option key={c} value={c}>{c}</option>
-              ))}
-            </select>
+          <div style={{ maxWidth: "1400px", margin: "0 auto" }}>
+            
+            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "25px" }}>
+              <h1 style={{ fontSize: "22px", fontWeight: "700", color: "#1e293b" }}>My Grade Dashboard</h1>
+              <select 
+                value={dashboardCourse} 
+                onChange={(e) => setDashboardCourse(e.target.value)}
+                style={{ padding: "8px 15px", borderRadius: "8px", border: "1px solid #e2e8f0", outline: "none" }}
+              >
+                {courses.map(c => <option key={c} value={c}>{c}</option>)}
+              </select>
+            </div>
 
-            {/* الحسابات في الخلفية */}
+            {/* الحسابات المخفية */}
             <div style={{ display: "none" }}>
-              <CourseTable
-                data={coursesData[dashboardCourse]}
-                onMetricsChange={handleMetricsChange}
-              />
+              <CourseTable data={coursesData[dashboardCourse]} onMetricsChange={handleMetricsChange} />
             </div>
 
             {metrics && (
-              <div style={{ display: "flex", gap: 20, flexWrap: "wrap" }}>
-                <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-                  <GoalCard remaining={metrics.remainingForAPlus} />
-                  <QuizGauge value={Number(metrics.bestQuizTotal)} max={10} />
+              /* --- الهيكل الأساسي للصف العلوي (GRID) --- */
+              <div style={{ 
+                display: "grid", 
+                gridTemplateColumns: "200px 1.4fr 1fr 1.4fr", 
+                gap: "20px", 
+                alignItems: "stretch" 
+              }}>
+                
+                {/* 1. العمود الأيسر: Goal + Gauge فوق بعض */}
+                <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+                  <div style={cardStyle}><GoalCard remaining={metrics.remainingForAPlus} /></div>
+                  <div style={cardStyle}>
+                    <p style={labelStyle}>Total best quizzes</p>
+                    <QuizGauge value={metrics.bestQuizTotal} max={10} /> 
+                  </div>
                 </div>
 
-                <BestQuizzesChart quizzes={metrics.quizList} excluded={metrics.excludedIndex} />
-                <CoursePie obtained={Number(metrics.totalObtained)} total={Number(metrics.totalPossible)} />
-                <DistributionDonut rows={coursesData[dashboardCourse]} />
+                {/* 2. عمود الأعمدة (Best Quizzes) */}
+                <div style={cardStyle}>
+                  <p style={labelStyle}>Best Quizzes</p>
+                  <BestQuizzesChart quizzes={metrics.quizList} excluded={metrics.excludedIndex} />
+                </div>
+
+                {/* 3. عمود الـ Pie (Total Grade) */}
+                <div style={cardStyle}>
+                  <p style={labelStyle}>Total course grade for semester</p>
+                  <CoursePie obtained={Number(metrics.totalObtained)} total={100} />
+                </div>
+
+                {/* 4. عمود الدونات (Distribution) */}
+                <div style={cardStyle}>
+                  <p style={labelStyle}>Distribution of course grades</p>
+                  <DistributionDonut rows={coursesData[dashboardCourse]} />
+                </div>
+
               </div>
             )}
-          </>
+          </div>
         )}
 
-        {view === "course" && selectedCourse && (
-          <>
-            <h1 style={{ marginBottom: 20 }}>{selectedCourse} Details</h1>
-            <CourseTable
-              data={coursesData[selectedCourse]}
-              onMetricsChange={handleMetricsChange}
-            />
-          </>
+        {view === "course" && (
+          <div style={cardStyle}>
+             {/* هنا يوضع جدول التفاصيل عند الضغط على المادة من السايدبار */}
+             <CourseTable data={coursesData[dashboardCourse]} onMetricsChange={handleMetricsChange} />
+          </div>
         )}
       </div>
     </div>
   );
 }
+
+/* تنسيقات الكروت لضمان شكل احترافي */
+const cardStyle = {
+  background: "#ffffff",
+  borderRadius: "16px",
+  padding: "20px",
+  boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)",
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  justifyContent: "center",
+  width: "100%"
+};
+
+const labelStyle = {
+  fontSize: "13px",
+  color: "#64748b",
+  marginBottom: "15px",
+  fontWeight: "600",
+  textAlign: "center",
+  width: "100%"
+};
