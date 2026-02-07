@@ -62,10 +62,14 @@ export default function Home() {
                 {/* 1. العمود الأيسر: Goal + Gauge فوق بعض */}
                 <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
                   <div style={cardStyle}><GoalCard remaining={metrics.remainingForAPlus} /></div>
-                  <div style={cardStyle}>
-                    <p style={labelStyle}>Total best quizzes</p>
-                    <QuizGauge value={metrics.bestQuizTotal} max={10} /> 
-                  </div>
+                 <div style={{ 
+  display: "grid", 
+  gridTemplateColumns: "180px 1.2fr 1fr 1.2fr", 
+  gap: "15px", 
+  alignItems: "stretch" 
+}}>
+  {/* هنا تضع المكونات الأربعة كما رتبناها سابقاً */}
+</div>
                 </div>
 
                 {/* 2. عمود الأعمدة (Best Quizzes) */}
