@@ -30,10 +30,13 @@ export default function CourseTable({ data, onMetricsChange }) {
   const remainingForA = Math.max(0, totalPossible * 0.9 - totalObtained).toFixed(1);
   const bestQuizTotal = quizzes.reduce((s, q) => s + q.obtained, 0) - (lowestQuiz?.obtained || 0);
 
-  // إرسال البيانات للأب مع حماية من التكرار اللانهائي
-  useEffect(() => {
+// داخل useEffect في ملف CourseTable.jsx
+useEffect(() => {
     const excludedIndex = lowestQuiz ? quizzes.findIndex((q) => q === lowestQuiz) : -1;
     
+    // حساب إجمالي الدرجات المتاحة للكويزات فقط (مثلاً 5 + 5 + 5)
+    const quizPossibleTotal = quizzes.reduce((s, q) => s + q.total, 0) - (lowestQuiz?.total || 0);
+
     const timer = setTimeout(() => {
       onMetricsChange?.({
         totalObtained,
@@ -42,13 +45,14 @@ export default function CourseTable({ data, onMetricsChange }) {
         remainingForAPlus,
         remainingForA,
         bestQuizTotal,
+        quizPossibleTotal, // أضفنا هذا السطر ليرسل القيمة العليا
         quizList: quizzes,
         excludedIndex
       });
     }, 50);
 
     return () => clearTimeout(timer);
-  }, [totalObtained, totalPossible, excludeQuiz, onMetricsChange]);
+}, [totalObtained, totalPossible, excludeQuiz, onMetricsChange]);
 
   const handleChange = (i, val) => {
     const copy = [...rows];
