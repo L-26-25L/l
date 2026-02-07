@@ -62,13 +62,15 @@ export default function Home() {
                 {/* 1. العمود الأيسر: Goal + Gauge فوق بعض */}
                 <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
                   <div style={cardStyle}><GoalCard remaining={metrics.remainingForAPlus} /></div>
-                 <div style={{ 
+                // داخل صفحة page.jsx
+<div style={{ 
   display: "grid", 
-  gridTemplateColumns: "180px 1.2fr 1fr 1.2fr", 
-  gap: "15px", 
+  gridTemplateColumns: "160px 1.2fr 1fr 1.2fr", // صغرنا العمود الأول لـ 160px
+  gap: "10px", // قللنا المسافة بين المربعات
   alignItems: "stretch" 
 }}>
-  {/* هنا تضع المكونات الأربعة كما رتبناها سابقاً */}
+  {/* المكونات كما هي */}
+</div>
 </div>
                 </div>
 
@@ -106,17 +108,18 @@ export default function Home() {
   );
 }
 
-/* تنسيقات الكروت لضمان شكل احترافي */
+// تحديث ستايل الكروت
 const cardStyle = {
   background: "#ffffff",
-  borderRadius: "16px",
-  padding: "20px",
-  boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)",
+  borderRadius: "12px",
+  padding: "12px", // قللنا الحشو الداخلي
+  boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
   display: "flex",
   flexDirection: "column",
   alignItems: "center",
   justifyContent: "center",
-  width: "100%"
+  width: "100%",
+  minHeight: "160px" // حددنا حد أدنى للارتفاع لتوحيد الأشكال
 };
 
 const labelStyle = {
