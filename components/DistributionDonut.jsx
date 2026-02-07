@@ -1,22 +1,29 @@
-import { PieChart, Pie, Cell, Tooltip } from "recharts";
+import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from "recharts";
 
 export default function DistributionDonut({ rows }) {
-  const colors = ["#c5d8e1","#b5c8d8","#a5b8cf","#95a8c6","#8598bd"];
+  // تدرجات السماوي الباهت كما طلبت
+  const colors = ["#001f3f", "#1e90ff", "#4682b4", "#87ceeb", "#add8e6", "#b0c4de"];
 
   return (
-    <PieChart width={240} height={240}>
-      <Pie
-        data={rows}
-        dataKey="total"
-        nameKey="type"
-        innerRadius={60}
-        outerRadius={90}
-      >
-        {rows.map((_, i) => (
-          <Cell key={i} fill={colors[i % colors.length]} />
-        ))}
-      </Pie>
-      <Tooltip />
-    </PieChart>
+    <div style={{ width: "100%", height: 220 }}>
+      <ResponsiveContainer width="100%" height="100%">
+        <PieChart>
+          <Pie
+            data={rows}
+            dataKey="total"
+            nameKey="type"
+            innerRadius="60%"
+            outerRadius="85%"
+            paddingAngle={2}
+          >
+            {rows.map((_, i) => (
+              <Cell key={i} fill={colors[i % colors.length]} />
+            ))}
+          </Pie>
+          <Tooltip />
+          <Legend layout="vertical" align="right" verticalAlign="middle" iconType="circle" />
+        </PieChart>
+      </ResponsiveContainer>
+    </div>
   );
 }
