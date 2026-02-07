@@ -30,29 +30,32 @@ export default function CourseTable({ data, onMetricsChange }) {
   const remainingForA = Math.max(0, totalPossible * 0.9 - totalObtained).toFixed(1);
   const bestQuizTotal = quizzes.reduce((s, q) => s + q.obtained, 0) - (lowestQuiz?.obtained || 0);
 
-// داخل useEffect في ملف CourseTable.jsx
+// --- بداية التعديل (الخطوة رقم 3) ---
 useEffect(() => {
-    const excludedIndex = lowestQuiz ? quizzes.findIndex((q) => q === lowestQuiz) : -1;
-    
-    // حساب إجمالي الدرجات المتاحة للكويزات فقط (مثلاً 5 + 5 + 5)
-    const quizPossibleTotal = quizzes.reduce((s, q) => s + q.total, 0) - (lowestQuiz?.total || 0);
+  // 1. تحديد أي كويز هو المستبعد
+  const excludedIndex = lowestQuiz ? quizzes.findIndex((q) => q === lowestQuiz) : -1;
+  
+  // 2. حساب إجمالي الدرجات المتاحة للكويزات (القيمة القصوى للـ Gauge)
+  const quizPossibleTotal = quizzes.reduce((s, q) => s + q.total, 0) - (lowestQuiz?.total || 0);
 
-    const timer = setTimeout(() => {
-      onMetricsChange?.({
-        totalObtained,
-        totalPossible,
-        percentage,
-        remainingForAPlus,
-        remainingForA,
-        bestQuizTotal,
-        quizPossibleTotal, // أضفنا هذا السطر ليرسل القيمة العليا
-        quizList: quizzes,
-        excludedIndex
-      });
-    }, 50);
+  // 3. إرسال كل البيانات للوحة التحكم (Dashboard)
+  const timer = setTimeout(() => {
+    onMetricsChange?.({
+      totalObtained,        // إجمالي درجاتك في المادة (للدائرة المكتملة)
+      totalPossible,       // إجمالي الدرجات الممكنة (100)
+      percentage,          // النسبة المئوية
+      remainingForAPlus,   // المتبقي للـ A+ (للكرت العلوي)
+      remainingForA,
+      bestQuizTotal,       // درجتك الحالية في الكويزات (لـ رقم الـ Gauge)
+      quizPossibleTotal,   // إجمالي الكويزات (لـ حد الـ Gauge الأقصى)
+      quizList: quizzes,   // قائمة الكويزات (للأعمدة)
+      excludedIndex        // مكان العمود الغامق
+    });
+  }, 50);
 
-    return () => clearTimeout(timer);
-}, [totalObtained, totalPossible, excludeQuiz, onMetricsChange]);
+  return () => clearTimeout(timer);
+}, [totalObtained, totalPossible, excludeQuiz, onMetricsChange, quizzes, lowestQuiz]);
+// --- نهاية التعديل ---
 
   const handleChange = (i, val) => {
     const copy = [...rows];
