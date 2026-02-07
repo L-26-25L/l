@@ -1,25 +1,24 @@
-import { BarChart, Bar, XAxis, YAxis, Tooltip, Cell, ResponsiveContainer, LabelList } from "recharts";
+import { BarChart, Bar, XAxis, Tooltip, Cell, ResponsiveContainer, LabelList } from "recharts";
 
 export default function BestQuizzesChart({ quizzes, excluded }) {
-  // نجهز البيانات للتأكد من وجود مسميات واضحة
-  const data = quizzes.map((q, index) => ({
-    name: q.type || `Quiz ${index + 1}`,
-    value: q.obtained
-  }));
+  // ألوان التدرج الأزرق
+  const colors = ["#8ab4d0", "#76a1c1", "#628eb2", "#4e7ba3"];
 
   return (
-    <div style={{ width: "100%", height: 200 }}>
+    <div style={{ width: "100%", height: 180 }}>
       <ResponsiveContainer width="100%" height="100%">
-        <BarChart data={data} margin={{ top: 25, right: 10, left: -25, bottom: 5 }}>
+        <BarChart data={quizzes} margin={{ top: 20, right: 10, left: -20, bottom: 0 }}>
           <XAxis dataKey="name" tick={{fontSize: 10}} axisLine={false} tickLine={false} />
-          <YAxis hide domain={[0, 'auto']} />
           <Tooltip cursor={{fill: 'transparent'}} />
-          <Bar dataKey="value" radius={[4, 4, 0, 0]} barSize={30}>
-            {data.map((entry, i) => (
-              <Cell key={i} fill={i === excluded ? "#2c3e50" : "#8ab4d0"} />
+          <Bar dataKey="obtained" radius={[4, 4, 0, 0]}>
+            {quizzes.map((q, i) => (
+              <Cell 
+                key={i} 
+                // إذا كان هو الكويز المستبعد لونه غامق جداً، وإلا يأخذ لون من المصفوفة
+                fill={i === excluded ? "#2c3e50" : colors[i % colors.length]} 
+              />
             ))}
-            {/* إظهار الرقم فوق العمود */}
-            <LabelList dataKey="value" position="top" style={{ fontSize: '12px', fill: '#1a3a5a', fontWeight: 'bold' }} />
+            <LabelList dataKey="obtained" position="top" style={{ fontSize: '12px', fontWeight: 'bold' }} />
           </Bar>
         </BarChart>
       </ResponsiveContainer>
