@@ -12,7 +12,9 @@ export default function CourseTable({ data, onMetricsChange }) {
   }, [data]);
 
   // الحسابات المنطقية
-  const quizzes = useMemo(() => rows.filter((r) => r.type.toLowerCase().includes("quiz")), [rows]);
+ const quizzes = rows.filter((r) => 
+  r.type && typeof r.type === 'string' && r.type.toLowerCase().includes("quiz")
+);
 
   const lowestQuiz = useMemo(() => {
     return excludeQuiz && quizzes.length > 0
