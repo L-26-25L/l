@@ -40,6 +40,15 @@ export default function Home() {
 
       <div style={{ flex: 1, padding: "25px", overflowY: "auto" }}>
         
+        {/* هـذا الجزء هو المحرك الذي يحسب البيانات - وضعناه بشكل مخفي تقنياً لكنه يعمل */}
+        <div style={{ position: "absolute", opacity: 0, pointerEvents: "none", zIndex: -1 }}>
+          <CourseTable 
+            key={`calc-${dashboardCourse}`} 
+            data={coursesData[dashboardCourse]} 
+            onMetricsChange={handleMetricsChange} 
+          />
+        </div>
+
         {view === "dashboard" && (
           <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "25px" }}>
@@ -53,22 +62,15 @@ export default function Home() {
               </select>
             </div>
 
-            <div style={{ display: "none" }}>
-              <CourseTable 
-                key={`calc-${dashboardCourse}`} 
-                data={coursesData[dashboardCourse]} 
-                onMetricsChange={handleMetricsChange} 
-              />
-            </div>
-
-            {metrics && (
+            {/* إذا كانت البيانات جاهزة، اعرض الرسوم */}
+            {metrics ? (
               <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
                 
-                {/* الصف العلوي - مقاسات أصغر ومسافات واضحة */}
+                {/* الصف العلوي */}
                 <div style={{ 
                   display: "grid", 
                   gridTemplateColumns: "150px 1.2fr 0.9fr 1.1fr", 
-                  gap: "20px", // مسافة بين الكروت
+                  gap: "20px", 
                   alignItems: "stretch" 
                 }}>
                   
@@ -96,7 +98,7 @@ export default function Home() {
                   </div>
                 </div>
 
-                {/* الصف السفلي - تحليل ومستويات */}
+                {/* الصف السفلي */}
                 <div style={{ display: "grid", gridTemplateColumns: "1.6fr 1fr", gap: "20px" }}>
                   <div style={smallCardStyle}>
                      <p style={labelStyle}>Grade Analysis</p>
@@ -116,6 +118,10 @@ export default function Home() {
                   </div>
                 </div>
 
+              </div>
+            ) : (
+              <div style={{ textAlign: 'center', marginTop: '50px', color: '#64748b' }}>
+                Loading Dashboard Data...
               </div>
             )}
           </div>
@@ -138,7 +144,7 @@ export default function Home() {
   );
 }
 
-// تصميم الكروت الصغير والمحدد
+// الستاييل الخاص بالكروت
 const smallCardStyle = {
   background: "#ffffff",
   borderRadius: "10px",
@@ -149,7 +155,7 @@ const smallCardStyle = {
   alignItems: "center",
   justifyContent: "center",
   width: "100%",
-  minHeight: "120px", // يضمن وجود مساحة للرسم
+  minHeight: "140px",
   overflow: "hidden"
 };
 
@@ -159,5 +165,6 @@ const labelStyle = {
   marginBottom: "8px",
   fontWeight: "600",
   textTransform: "uppercase",
-  letterSpacing: "0.5px"
+  letterSpacing: "0.5px",
+  textAlign: "center"
 };
