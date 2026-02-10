@@ -89,7 +89,8 @@ export default function Home() {
 
                   <div style={smallCardStyle}>
                     <p style={labelStyle}>Total course grade</p>
-                    <div style={{width: '100%', height: '140px'}}><CoursePie obtained={metrics.totalObtained} total={100} /></div>
+                    <div style={{width: '100%', height: '140px'}}>// داخل صفحة page.js عند استدعاء المكون
+<CoursePie obtained={metrics.totalObtained} total={metrics.totalPossible} /></div>
                   </div>
 
                   <div style={smallCardStyle}>
