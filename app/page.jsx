@@ -21,9 +21,13 @@ export default function Home() {
   const [selectedCourse, setSelectedCourse] = useState(courses[0]);
   const [dashboardCourse, setDashboardCourse] = useState(courses[0]);
 
-  const handleMetricsChange = useCallback((newMetrics) => {
-    setMetrics(newMetrics);
-  }, []);
+  1}
+const handleMetricsChange = useCallback((newMetrics) => {
+  console.log("METRICS 👉", newMetrics);
+  console.log("QUIZ LIST 👉", newMetrics.quizList);
+
+  setMetrics(newMetrics);
+}, []
 
   const handleSidebarClick = (courseName) => {
     setSelectedCourse(courseName);
