@@ -6,14 +6,16 @@ export default function CourseTable({ data, onMetricsChange }) {
   const [rows, setRows] = useState(data);
   const [excludeQuiz, setExcludeQuiz] = useState(true);
 
-  // تحديث الصفوف عند تغيير المقرر من الخارج
+  // تحديث الصفوف عند تغيير المقرر من الخارج (Sidebar)
   useEffect(() => {
     setRows(data);
   }, [data]);
 
-  // الحسابات المنطقية
-  const quizzes = rows.filter((r) => 
-    r && r.type && typeof r.type === 'string' && r.type.toLowerCase().includes("quiz")
+  // منطق الحسابات
+  const quizzes = useMemo(() => 
+    rows.filter((r) => 
+      r && r.type && typeof r.type === 'string' && r.type.toLowerCase().includes("quiz")
+    ), [rows]
   );
 
   const lowestQuiz = useMemo(() => {
@@ -32,10 +34,9 @@ export default function CourseTable({ data, onMetricsChange }) {
   const remainingForA = Math.max(0, totalPossible * 0.9 - totalObtained).toFixed(1);
   const bestQuizTotal = quizzes.reduce((s, q) => s + q.obtained, 0) - (lowestQuiz?.obtained || 0);
 
-  // --- جزئية الـ useEffect المحدثة ---
+  // إرسال البيانات المحدثة للداشبورد (الـ Page)
   useEffect(() => {
     const excludedIndex = lowestQuiz ? quizzes.findIndex((q) => q === lowestQuiz) : -1;
-    
     const quizPossibleTotal = quizzes.reduce((s, q) => s + q.total, 0) - (lowestQuiz?.total || 0);
 
     const timer = setTimeout(() => {
@@ -47,20 +48,16 @@ export default function CourseTable({ data, onMetricsChange }) {
         remainingForA,
         bestQuizTotal,
         quizPossibleTotal,
-        
-        // التعديل الجديد هنا: إرسال الاسم والدرجة فقط
         quizList: quizzes.map(q => ({
           name: q.type,
           obtained: q.obtained
         })),
-
         excludedIndex
       });
     }, 50);
 
     return () => clearTimeout(timer);
   }, [totalObtained, totalPossible, excludeQuiz, onMetricsChange, quizzes, lowestQuiz, percentage, remainingForAPlus, remainingForA, bestQuizTotal]);
-  // ------------------------------
 
   const handleChange = (i, val) => {
     const copy = [...rows];
@@ -69,50 +66,87 @@ export default function CourseTable({ data, onMetricsChange }) {
   };
 
   return (
-    <>
-      {quizzes.length > 0 && (
-        <button
-          onClick={() => setExcludeQuiz(!excludeQuiz)}
-          style={{
-            marginBottom: 15, padding: "8px 16px", background: "#734073",
-            color: "#fff", border: "none", borderRadius: 6, cursor: "pointer"
-          }}
-        >
-          {excludeQuiz ? "❌ Exclude Lowest Quiz" : "✔️ Count All Quizzes"}
-        </button>
-      )}
+    <div style={{ width: "100%" }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 15 }}>
+        <h3 style={{ fontSize: '14px', color: '#1e293b', margin: 0 }}>Assessment Breakdown</h3>
+        {quizzes.length > 0 && (
+          <button
+            onClick={() => setExcludeQuiz(!excludeQuiz)}
+            style={{
+              padding: "6px 12px", 
+              background: excludeQuiz ? "#fef2f2" : "#f0fdf4",
+              color: excludeQuiz ? "#991b1b" : "#166534", 
+              border: `1px solid ${excludeQuiz ? "#fecaca" : "#bbf7d0"}`,
+              borderRadius: 6, 
+              cursor: "pointer",
+              fontSize: "11px",
+              fontWeight: "600",
+              transition: "all 0.2s"
+            }}
+          >
+            {excludeQuiz ? "❌ Lowest Quiz Excluded" : "✔️ Counting All Quizzes"}
+          </button>
+        )}
+      </div>
 
-      <table style={{ width: "100%", background: "#fff", borderCollapse: "collapse", borderRadius: 8, overflow: "hidden" }}>
-        <thead>
-          <tr style={{ background: "#f0f0f0" }}>
-            <th style={th}>Assessment Type</th>
-            <th style={th}>Total Grade</th>
-            <th style={th}>Grade Obtained</th>
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((row, i) => {
-            const isExcluded = row === lowestQuiz;
-            return (
-              <tr key={i} style={{ opacity: isExcluded ? 0.4 : 1, background: isExcluded ? "#eee" : "white" }}>
-                <td style={td}>{row.type}</td>
-                <td style={td}>{row.total}</td>
-                <td style={td}>
-                  <input
-                    type="number"
-                    value={row.obtained}
-                    onChange={(e) => handleChange(i, e.target.value)}
-                    style={{ width: 70, padding: 4 }}
-                  />
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-    </>
+      <div style={{ overflowX: "auto", borderRadius: 8, border: "1px solid #e2e8f0" }}>
+        <table style={{ width: "100%", background: "#fff", borderCollapse: "collapse" }}>
+          <thead>
+            <tr style={{ background: "#f8fafc" }}>
+              <th style={thStyle}>Assessment Type</th>
+              <th style={thStyle}>Total</th>
+              <th style={thStyle}>Obtained</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((row, i) => {
+              const isExcluded = row === lowestQuiz;
+              return (
+                <tr key={i} style={{ 
+                  background: isExcluded ? "#fff1f2" : "white",
+                  transition: "background 0.3s"
+                }}>
+                  <td style={{ ...tdStyle, color: isExcluded ? "#94a3b8" : "#1e293b", fontWeight: isExcluded ? "400" : "500" }}>
+                    {row.type} {isExcluded && <span style={{fontSize: '9px', color: '#ef4444'}}>(Excluded)</span>}
+                  </td>
+                  <td style={tdStyle}>{row.total}</td>
+                  <td style={tdStyle}>
+                    <input
+                      type="number"
+                      value={row.obtained}
+                      onChange={(e) => handleChange(i, e.target.value)}
+                      style={{ 
+                        width: 60, 
+                        padding: "4px 8px", 
+                        borderRadius: 4, 
+                        border: "1px solid #cbd5e1",
+                        fontSize: "13px",
+                        textAlign: "center",
+                        background: isExcluded ? "#f8fafc" : "white"
+                      }}
+                    />
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    </div>
   );
 }
 
-const th = { padding: 12, textAlign: "left", borderBottom: "2px solid #ddd" };
-const td = { padding: 12, borderBottom: "1px solid #ddd" };
+const thStyle = { 
+  padding: "10px 12px", 
+  textAlign: "left", 
+  borderBottom: "1px solid #e2e8f0", 
+  fontSize: "12px", 
+  color: "#64748b",
+  fontWeight: "600"
+};
+
+const tdStyle = { 
+  padding: "10px 12px", 
+  borderBottom: "1px solid #f1f5f9", 
+  fontSize: "13px" 
+};
