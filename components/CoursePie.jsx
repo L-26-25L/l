@@ -1,13 +1,20 @@
+"use client";
+
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
 
 export default function CoursePie({ obtained, total }) {
+  // نجهز البيانات مع التأكد أنها أرقام
+  const valObtained = Number(obtained) || 0;
+  const valTotal = Number(total) || 100;
+  
   const data = [
-    { name: "Obtained", value: Number(obtained) || 0 },
-    { name: "Remaining", value: Math.max(0, (Number(total) || 100) - (Number(obtained) || 0)) }
+    { name: "Obtained", value: valObtained },
+    { name: "Remaining", value: Math.max(0, valTotal - valObtained) }
   ];
 
   return (
-    <div style={{ width: "100%", height: 180, position: "relative", minHeight: "180px" }}>
+    // أضفنا عرض ثابت بسيط للحاوية الخارجية لضمان استقرار الرسم
+    <div style={{ width: "100%", height: 150, position: "relative", display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
       <ResponsiveContainer width="100%" height="100%">
         <PieChart>
           <Pie 
@@ -15,26 +22,35 @@ export default function CoursePie({ obtained, total }) {
             dataKey="value" 
             cx="50%" 
             cy="50%" 
-            innerRadius="65%" 
-            outerRadius="90%" 
+            // استبدلنا النسب بـ أرقام بكسلية (Radius) لضمان الظهور
+            innerRadius={45} 
+            outerRadius={60} 
             startAngle={90} 
             endAngle={450}
             stroke="none"
+            paddingAngle={0}
           >
-            <Cell fill="#1a3a5a" /> {/* اللون الكحلي للدرجة الحاصلة عليها */}
-            <Cell fill="#e2e8f0" /> {/* لون رمادي فاتح للمتبقي */}
+            {/* اللون الكحلي للدرجة الحاصلة عليها */}
+            <Cell fill="#1a3a5a" /> 
+            {/* لون رمادي فاتح للمتبقي */}
+            <Cell fill="#f1f5f9" /> 
           </Pie>
         </PieChart>
       </ResponsiveContainer>
       
-      {/* الرقم في المنتصف */}
+      {/* الرقم في المنتصف - قمنا بتصغير الخط قليلاً ليتناسب مع المقاسات الجديدة */}
       <div style={{ 
-        position: "absolute", top: "50%", left: "50%", 
-        transform: "translate(-50%, -50%)", textAlign: "center",
-        pointerEvents: "none" // لضمان عدم تداخل النصوص مع الماوس
+        position: "absolute", 
+        textAlign: "center",
+        pointerEvents: "none",
+        marginTop: "-5px" // تعديل بسيط لرفع النص للمركز تماماً
       }}>
-        <div style={{ fontSize: "22px", fontWeight: "bold", color: "#1a3a5a" }}>{obtained}</div>
-        <div style={{ fontSize: "10px", color: "#64748b" }}>Total Grade</div>
+        <div style={{ fontSize: "20px", fontWeight: "800", color: "#1a3a5a", lineHeight: 1 }}>
+          {valObtained}
+        </div>
+        <div style={{ fontSize: "9px", color: "#94a3b8", marginTop: "2px", fontWeight: "600" }}>
+          OUT OF {valTotal}
+        </div>
       </div>
     </div>
   );
