@@ -21,13 +21,11 @@ export default function Home() {
   const [selectedCourse, setSelectedCourse] = useState(courses[0]);
   const [dashboardCourse, setDashboardCourse] = useState(courses[0]);
 
-  1}
-const handleMetricsChange = useCallback((newMetrics) => {
-  console.log("METRICS 👉", newMetrics);
-  console.log("QUIZ LIST 👉", newMetrics.quizList);
-
-  setMetrics(newMetrics);
-}, []);
+  // دالة استقبال البيانات من الجدول
+  const handleMetricsChange = useCallback((newMetrics) => {
+    // قمنا بإزالة الكود العشوائي الذي كان هنا
+    setMetrics(newMetrics);
+  }, []);
 
   const handleSidebarClick = (courseName) => {
     setSelectedCourse(courseName);
@@ -44,8 +42,8 @@ const handleMetricsChange = useCallback((newMetrics) => {
 
       <div style={{ flex: 1, padding: "25px", overflowY: "auto" }}>
         
-        {/* هـذا الجزء هو المحرك الذي يحسب البيانات - وضعناه بشكل مخفي تقنياً لكنه يعمل */}
-        <div style={{ position: "absolute", opacity: 0, pointerEvents: "none", zIndex: -1 }}>
+        {/* المحرك المخفي للحسابات - يضمن تحديث الأرقام فوراً */}
+        <div style={{ position: "absolute", visibility: "hidden", pointerEvents: "none" }}>
           <CourseTable 
             key={`calc-${dashboardCourse}`} 
             data={coursesData[dashboardCourse]} 
@@ -66,60 +64,54 @@ const handleMetricsChange = useCallback((newMetrics) => {
               </select>
             </div>
 
-            {/* إذا كانت البيانات جاهزة، اعرض الرسوم */}
             {metrics ? (
-              <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: "25px" }}>
                 
-                {/* الصف العلوي */}
+                {/* الصف العلوي - مسافات واضحة */}
                 <div style={{ 
                   display: "grid", 
-                  gridTemplateColumns: "220px 1.3fr 1fr 1fr", 
-                  gap: "20px", 
+                  gridTemplateColumns: "220px 1.3fr 1fr 1.1fr", 
+                  gap: "25px", 
                   alignItems: "stretch" 
                 }}>
                   
-                  <div style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
+                  <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
                     <div style={smallCardStyle}><GoalCard remaining={metrics.remainingForAPlus} /></div>
                     <div style={smallCardStyle}>
                       <p style={labelStyle}>Total best quizzes</p>
-                      <div style={{width: '100%', height: '80px'}}><QuizGauge value={metrics.bestQuizTotal} max={metrics.quizPossibleTotal} /></div>
+                      <QuizGauge value={metrics.bestQuizTotal} max={metrics.quizPossibleTotal} />
                     </div>
                   </div>
 
                   <div style={smallCardStyle}>
                     <p style={labelStyle}>Best 4 Quizzes</p>
-                    <div style={{width: '100%', height: '140px'}}><BestQuizzesChart quizzes={metrics.quizList} excluded={metrics.excludedIndex} /></div>
+                    <BestQuizzesChart quizzes={metrics.quizList} excluded={metrics.excludedIndex} />
                   </div>
 
                   <div style={smallCardStyle}>
                     <p style={labelStyle}>Total course grade</p>
-                    <div style={{width: '100%', height: '140px'}}>
-<CoursePie obtained={metrics.totalObtained} total={metrics.totalPossible} /></div>
+                    <CoursePie obtained={metrics.totalObtained} total={metrics.totalPossible} />
                   </div>
 
                   <div style={smallCardStyle}>
                     <p style={labelStyle}>Distribution of grades</p>
-                    <div style={{width: '100%', height: '140px'}}><DistributionDonut rows={coursesData[dashboardCourse]} /></div>
+                    <DistributionDonut rows={coursesData[dashboardCourse]} />
                   </div>
                 </div>
 
                 {/* الصف السفلي */}
-                <div style={{ display: "grid", gridTemplateColumns: "1.6fr 1fr", gap: "20px" }}>
+                <div style={{ display: "grid", gridTemplateColumns: "1.6fr 1fr", gap: "25px" }}>
                   <div style={smallCardStyle}>
                      <p style={labelStyle}>Grade Analysis</p>
-                     <div style={{width: '100%', height: '180px'}}>
-                        <GradeAnalysisChart data={coursesData[dashboardCourse].map(i => ({ type: i.type, obtained: i.obtained }))} />
-                     </div>
+                     <GradeAnalysisChart data={coursesData[dashboardCourse].map(i => ({ type: i.type, obtained: i.obtained }))} />
                   </div>
                   <div style={smallCardStyle}>
                     <p style={labelStyle}>Student level in courses</p>
-                    <div style={{width: '100%', height: '180px'}}>
-                        <CourseBarChart data={Object.keys(coursesData).map(name => {
-                          const rows = coursesData[name];
-                          const totalObtained = rows.reduce((s, r) => s + (Number(r.obtained) || 0), 0);
-                          return { name: name, grade: (totalObtained / 100) * 50 };
-                        })} />
-                    </div>
+                    <CourseBarChart data={Object.keys(coursesData).map(name => {
+                      const rows = coursesData[name];
+                      const totalObtained = rows.reduce((s, r) => s + (Number(r.obtained) || 0), 0);
+                      return { name: name, grade: (totalObtained / 100) * 50 };
+                    })} />
                   </div>
                 </div>
 
@@ -135,7 +127,7 @@ const handleMetricsChange = useCallback((newMetrics) => {
         {view === "course" && (
           <div style={{ maxWidth: "1000px", margin: "0 auto" }}>
             <h2 style={{ marginBottom: "20px", fontSize: "18px", color: "#1e293b" }}>{selectedCourse} Details</h2>
-            <div style={{ ...smallCardStyle, padding: '20px', alignItems: 'flex-start' }}>
+            <div style={{ background: "#fff", padding: '20px', borderRadius: '12px', boxShadow: "0 1px 3px rgba(0,0,0,0.1)" }}>
                <CourseTable 
                  key={selectedCourse} 
                  data={coursesData[selectedCourse]} 
@@ -149,27 +141,24 @@ const handleMetricsChange = useCallback((newMetrics) => {
   );
 }
 
-// الستاييل الخاص بالكروت
 const smallCardStyle = {
   background: "#ffffff",
-  borderRadius: "10px",
-  padding: "12px",
-  boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+  borderRadius: "12px",
+  padding: "15px",
+  boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
   display: "flex",
   flexDirection: "column",
   alignItems: "center",
   justifyContent: "center",
   width: "100%",
-  minHeight: "140px",
-  overflow: "hidden"
+  minHeight: "150px"
 };
 
 const labelStyle = {
   fontSize: "11px",
   color: "#64748b",
-  marginBottom: "8px",
+  marginBottom: "10px",
   fontWeight: "600",
   textTransform: "uppercase",
-  letterSpacing: "0.5px",
   textAlign: "center"
 };
