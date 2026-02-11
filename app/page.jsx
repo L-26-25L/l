@@ -69,7 +69,7 @@ export default function Home() {
                 {/* الصف العلوي */}
                 <div style={{ 
                   display: "grid", 
-                  gridTemplateColumns: "150px 1.2fr 0.9fr 1.1fr", 
+                  gridTemplateColumns: "220px 1.3fr 1fr 1fr", 
                   gap: "20px", 
                   alignItems: "stretch" 
                 }}>
@@ -89,7 +89,7 @@ export default function Home() {
 
                   <div style={smallCardStyle}>
                     <p style={labelStyle}>Total course grade</p>
-                    <div style={{width: '100%', height: '140px'}}>// داخل صفحة page.js عند استدعاء المكون
+                    <div style={{width: '100%', height: '140px'}}>
 <CoursePie obtained={metrics.totalObtained} total={metrics.totalPossible} /></div>
                   </div>
 
