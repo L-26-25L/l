@@ -27,7 +27,7 @@ const handleMetricsChange = useCallback((newMetrics) => {
   console.log("QUIZ LIST 👉", newMetrics.quizList);
 
   setMetrics(newMetrics);
-}, []
+}, []);
 
   const handleSidebarClick = (courseName) => {
     setSelectedCourse(courseName);
