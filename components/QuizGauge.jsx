@@ -1,28 +1,35 @@
+"use client";
+
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
 
 export default function QuizGauge({ value, max }) {
-  // الحساب: القيمة التي حصل عليها الطالب مقابل المجموع الممكن للكويزات
+  // التأكد من أن القيم أرقام صحيحة
+  const val = Number(value) || 0;
+  const m = Number(max) || 10; // قيمة افتراضية في حال عدم وجود بيانات
+
   const data = [
-    { value: value },
-    { value: max - value }
+    { value: val },
+    { value: Math.max(0, m - val) }
   ];
 
-  const COLORS = ["#4f46e5", "#e2e8f0"]; // بنفسجي للأداء، رمادي للمفقود
+  // ألوان متناسقة: كحلي للتقدم، ورمادي فاتح للخلفية
+  const COLORS = ["#1a3a5a", "#f1f5f9"];
 
   return (
-    <div style={{ width: "100%", height: "100%", position: "relative" }}>
+    <div style={{ width: "100%", height: 100, position: "relative" }}>
       <ResponsiveContainer width="100%" height="100%">
         <PieChart>
           <Pie
             data={data}
             cx="50%"
-            cy="80%" // ننزله للأسفل ليعطي شكل العداد (Gauge)
+            cy="100%" // رفعناه قليلاً ليناسب الحاوية الصغيرة
             startAngle={180}
             endAngle={0}
-            innerRadius={30}
-            outerRadius={45}
-            paddingAngle={2}
+            innerRadius={45} // أقطار ثابتة لضمان الظهور
+            outerRadius={60}
+            paddingAngle={0}
             dataKey="value"
+            stroke="none"
           >
             {data.map((entry, index) => (
               <Cell key={`cell-${index}`} fill={COLORS[index]} />
@@ -31,16 +38,17 @@ export default function QuizGauge({ value, max }) {
         </PieChart>
       </ResponsiveContainer>
       
-      {/* عرض الرقم في المنتصف */}
+      {/* عرض الرقم في المنتصف أسفل القوس */}
       <div style={{
         position: "absolute",
-        bottom: "10%",
+        bottom: "0px",
         left: "50%",
         transform: "translateX(-50%)",
-        textAlign: "center"
+        textAlign: "center",
+        pointerEvents: "none"
       }}>
-        <span style={{ fontSize: "14px", fontWeight: "bold", color: "#1e293b" }}>{value}</span>
-        <span style={{ fontSize: "10px", color: "#64748b" }}>/{max}</span>
+        <span style={{ fontSize: "16px", fontWeight: "800", color: "#1a3a5a" }}>{val}</span>
+        <span style={{ fontSize: "10px", color: "#94a3b8", fontWeight: "600" }}>/{m}</span>
       </div>
     </div>
   );
