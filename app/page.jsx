@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import Sidebar from "../components/Sidebar";
 import CourseTable from "../components/CourseTable";
-import { coursesData } from "../data/courses";
+import { coursesData as initialData } from "../data/courses";
 
 // استيراد المكونات
 import GoalCard from "../components/GoalCard";
@@ -15,150 +15,211 @@ import CourseBarChart from "../components/CourseBarChart";
 import GradeAnalysisChart from "../components/GradeAnalysisChart";
 
 export default function Home() {
-  const courses = Object.keys(coursesData);
+  const [allCourses, setAllCourses] = useState(initialData);
+  const coursesNames = Object.keys(allCourses);
+  
   const [view, setView] = useState("dashboard");
   const [metrics, setMetrics] = useState(null);
-  const [selectedCourse, setSelectedCourse] = useState(courses[0]);
-  const [dashboardCourse, setDashboardCourse] = useState(courses[0]);
+  const [dashboardCourse, setDashboardCourse] = useState(coursesNames[0]);
+  const [targetGrade, setTargetGrade] = useState(95);
 
-  // دالة استقبال البيانات من الجدول
+  // دالة إضافة مادة جديدة (ستظهر عند الضغط على الزائد في السايدبار)
+  const addNewCourse = () => {
+    const name = prompt("Enter New Course Name:");
+    if (name && !allCourses[name]) {
+      setAllCourses({
+        ...allCourses,
+        [name]: [
+          { type: "Quiz 1", total: 10, obtained: 0 },
+          { type: "Midterm", total: 30, obtained: 0 },
+          { type: "Final", total: 40, obtained: 0 }
+        ]
+      });
+      setDashboardCourse(name);
+      setView("course"); // ينقلك فوراً لتعبئة بيانات المادة الجديدة
+    }
+  };
+
   const handleMetricsChange = useCallback((newMetrics) => {
-    // قمنا بإزالة الكود العشوائي الذي كان هنا
     setMetrics(newMetrics);
   }, []);
 
-  const handleSidebarClick = (courseName) => {
-    setSelectedCourse(courseName);
-    setView("course");
-  };
+  const remainingForTarget = useMemo(() => {
+    if (!metrics) return 0;
+    return Math.max(0, (metrics.totalPossible * (targetGrade / 100)) - metrics.totalObtained).toFixed(1);
+  }, [metrics, targetGrade]);
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: "#f8fafc", fontFamily: 'sans-serif' }}>
-      <Sidebar 
-        courses={courses} 
-        onSelectCourse={handleSidebarClick} 
-        onDashboard={() => setView("dashboard")} 
-      />
+    // استخدام خط Garamond والألوان الجديدة في الحاوية الرئيسية
+    <div style={{ 
+      display: "flex", 
+      minHeight: "100vh", 
+      background: "#f8fafc", 
+      fontFamily: "'EB Garamond', Garamond, serif" 
+    }}>
+      
+      {/* الخطوة 1: تثبيت السايدبار (Sticky Sidebar) */}
+      <aside style={{ 
+        position: "sticky", 
+        top: 0, 
+        height: "100vh", 
+        zIndex: 100 
+      }}>
+        <Sidebar 
+          courses={coursesNames} 
+          onSelectCourse={(name) => { setDashboardCourse(name); setView("course"); }} 
+          onDashboard={() => setView("dashboard")}
+          onAddCourse={addNewCourse} // نمرر الدالة هنا
+          sidebarColor="#30364F" // اللون الجديد للسايدبار
+          textColor="#ACBAC4"    // لون النصوص الجديد
+        />
+      </aside>
 
-      <div style={{ flex: 1, padding: "25px", overflowY: "auto" }}>
+      <main style={{ flex: 1, padding: "25px", overflowY: "auto" }}>
         
-        {/* المحرك المخفي للحسابات - يضمن تحديث الأرقام فوراً */}
-        <div style={{ position: "absolute", visibility: "hidden", pointerEvents: "none" }}>
+        {/* المحرك المخفي */}
+        <div style={{ display: "none" }}>
           <CourseTable 
             key={`calc-${dashboardCourse}`} 
-            data={coursesData[dashboardCourse]} 
+            data={allCourses[dashboardCourse]} 
             onMetricsChange={handleMetricsChange} 
           />
         </div>
 
-        {view === "dashboard" && (
+        {view === "dashboard" && metrics && (
           <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
+            
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "25px" }}>
-              <h1 style={{ fontSize: "18px", fontWeight: "700", color: "#0f172a" }}>My Grade Dashboard</h1>
+              {/* تعديل لون العنوان My Grade */}
+              <h1 style={{ fontSize: "28px", fontWeight: "bold", color: "#30364F" }}>
+                My Grade Dashboard
+              </h1>
+              
               <select 
                 value={dashboardCourse} 
                 onChange={(e) => setDashboardCourse(e.target.value)}
-                style={{ padding: "5px 10px", borderRadius: "6px", border: "1px solid #cbd5e1", fontSize: "13px" }}
+                style={selectStyle}
               >
-                {courses.map(c => <option key={c} value={c}>{c}</option>)}
+                {coursesNames.map(c => <option key={c} value={c}>{c}</option>)}
               </select>
             </div>
 
-            {metrics ? (
-              <div style={{ display: "flex", flexDirection: "column", gap: "25px" }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: "25px" }}>
+              
+              {/* الصف العلوي */}
+              <div style={{ display: "grid", gridTemplateColumns: "220px 1.3fr 1fr 1.1fr", gap: "25px" }}>
                 
-                {/* الصف العلوي - مسافات واضحة */}
-                <div style={{ 
-                  display: "grid", 
-                  gridTemplateColumns: "220px 1.3fr 1fr 1.1fr", 
-                  gap: "25px", 
-                  alignItems: "stretch" 
-                }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
+                  <div style={{ ...smallCardStyle, position: "relative" }}>
+                    {/* زر اختيار الدرجة المتبقية ^ */}
+                    <select 
+                      value={targetGrade}
+                      onChange={(e) => setTargetGrade(Number(e.target.value))}
+                      style={targetSelectStyle}
+                    >
+                      <option value="95">A+</option>
+                      <option value="90">A</option>
+                      <option value="85">B+</option>
+                      <option value="82">B</option>
+                      <option value="77">C+</option>
+                      <option value="72">C</option>
+                    </select>
+                    <GoalCard remaining={remainingForTarget} targetLabel={targetGrade} />
+                  </div>
                   
-                  <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-                    <div style={smallCardStyle}><GoalCard remaining={metrics.remainingForAPlus} /></div>
-                    <div style={smallCardStyle}>
-                      <p style={labelStyle}>Total best quizzes</p>
-                      <QuizGauge value={metrics.bestQuizTotal} max={metrics.quizPossibleTotal} />
-                    </div>
-                  </div>
-
                   <div style={smallCardStyle}>
-                    <p style={labelStyle}>Best 4 Quizzes</p>
-                    <BestQuizzesChart quizzes={metrics.quizList} excluded={metrics.excludedIndex} />
-                  </div>
-
-                  <div style={smallCardStyle}>
-                    <p style={labelStyle}>Total course grade</p>
-                    <CoursePie obtained={metrics.totalObtained} total={metrics.totalPossible} />
-                  </div>
-
-                  <div style={smallCardStyle}>
-                    <p style={labelStyle}>Distribution of grades</p>
-                    <DistributionDonut rows={coursesData[dashboardCourse]} />
+                    <p style={labelStyle}>Total best quizzes</p>
+                    <QuizGauge value={metrics.bestQuizTotal} max={metrics.quizPossibleTotal} />
                   </div>
                 </div>
 
-                {/* الصف السفلي */}
-                <div style={{ display: "grid", gridTemplateColumns: "1.6fr 1fr", gap: "25px" }}>
-                  <div style={smallCardStyle}>
-                     <p style={labelStyle}>Grade Analysis</p>
-                     <GradeAnalysisChart data={coursesData[dashboardCourse].map(i => ({ type: i.type, obtained: i.obtained }))} />
-                  </div>
-                  <div style={smallCardStyle}>
-                    <p style={labelStyle}>Student level in courses</p>
-                    <CourseBarChart data={Object.keys(coursesData).map(name => {
-                      const rows = coursesData[name];
-                      const totalObtained = rows.reduce((s, r) => s + (Number(r.obtained) || 0), 0);
-                      return { name: name, grade: (totalObtained / 100) * 50 };
-                    })} />
-                  </div>
+                <div style={smallCardStyle}>
+                  <p style={labelStyle}>Best 4 Quizzes</p>
+                  <BestQuizzesChart quizzes={metrics.quizList} excluded={metrics.excludedIndex} />
                 </div>
 
+                <div style={smallCardStyle}>
+                  <p style={labelStyle}>Total course grade</p>
+                  <CoursePie obtained={metrics.totalObtained} total={metrics.totalPossible} />
+                </div>
+
+                <div style={smallCardStyle}>
+                  <p style={labelStyle}>Distribution of grades</p>
+                  <DistributionDonut rows={allCourses[dashboardCourse]} />
+                </div>
               </div>
-            ) : (
-              <div style={{ textAlign: 'center', marginTop: '50px', color: '#64748b' }}>
-                Loading Dashboard Data...
+
+              {/* الصف السفلي */}
+              <div style={{ display: "grid", gridTemplateColumns: "1.6fr 1fr", gap: "25px" }}>
+                <div style={smallCardStyle}>
+                   <p style={labelStyle}>Grade Analysis (Obtained vs Total)</p>
+                   <GradeAnalysisChart data={allCourses[dashboardCourse]} />
+                </div>
+                <div style={smallCardStyle}>
+                  <p style={labelStyle}>Student Level In Courses</p>
+                  <CourseBarChart allCourses={allCourses} />
+                </div>
               </div>
-            )}
+
+            </div>
           </div>
         )}
 
         {view === "course" && (
           <div style={{ maxWidth: "1000px", margin: "0 auto" }}>
-            <h2 style={{ marginBottom: "20px", fontSize: "18px", color: "#1e293b" }}>{selectedCourse} Details</h2>
-            <div style={{ background: "#fff", padding: '20px', borderRadius: '12px', boxShadow: "0 1px 3px rgba(0,0,0,0.1)" }}>
+            <h2 style={{ marginBottom: "20px", color: "#30364F", fontSize: "22px" }}>{dashboardCourse} Details</h2>
+            <div style={{ background: "#fff", padding: '20px', borderRadius: '15px', boxShadow: "0 4px 6px rgba(0,0,0,0.05)" }}>
                <CourseTable 
-                 key={selectedCourse} 
-                 data={coursesData[selectedCourse]} 
+                 key={dashboardCourse} 
+                 data={allCourses[dashboardCourse]} 
                  onMetricsChange={() => {}} 
                />
             </div>
           </div>
         )}
-      </div>
+      </main>
     </div>
   );
 }
 
-const smallCardStyle = {
-  background: "#ffffff",
-  borderRadius: "12px",
-  padding: "15px",
-  boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
-  display: "flex",
-  flexDirection: "column",
-  alignItems: "center",
-  justifyContent: "center",
-  width: "100%",
-  minHeight: "150px"
+// الستايلات المضافة
+const selectStyle = { 
+  padding: "8px 15px", 
+  borderRadius: "10px", 
+  border: "1px solid #ACBAC4", 
+  color: "#30364F", 
+  fontSize: "14px",
+  outline: "none",
+  background: "#fff"
 };
 
-const labelStyle = {
-  fontSize: "11px",
-  color: "#64748b",
-  marginBottom: "10px",
+const targetSelectStyle = {
+  position: "absolute",
+  top: "10px",
+  right: "10px",
+  border: "none",
+  background: "#f1f5f9",
+  borderRadius: "5px",
+  fontSize: "10px",
+  fontWeight: "bold",
+  cursor: "pointer",
+  color: "#30364F"
+};
+
+const smallCardStyle = { 
+  background: "#ffffff", 
+  borderRadius: "15px", 
+  padding: "18px", 
+  boxShadow: "0 2px 10px rgba(0,0,0,0.03)",
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center"
+};
+
+const labelStyle = { 
+  fontSize: "13px", 
+  color: "#ACBAC4", 
+  marginBottom: "15px", 
   fontWeight: "600",
-  textTransform: "uppercase",
-  textAlign: "center"
+  textTransform: "uppercase" 
 };
