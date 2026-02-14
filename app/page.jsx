@@ -165,18 +165,26 @@ export default function Home() {
           </div>
         )}
 
-        {view === "course" && (
-          <div style={{ maxWidth: "1000px", margin: "0 auto" }}>
-            <h2 style={{ marginBottom: "20px", color: "#30364F", fontSize: "22px" }}>{dashboardCourse} Details</h2>
-            <div style={{ background: "#fff", padding: '20px', borderRadius: '15px', boxShadow: "0 4px 6px rgba(0,0,0,0.05)" }}>
-               <CourseTable 
-                 key={dashboardCourse} 
-                 data={allCourses[dashboardCourse]} 
-                 onMetricsChange={() => {}} 
-               />
-            </div>
-          </div>
-        )}
+       {view === "course" && (
+  <div style={{ maxWidth: "1000px", margin: "0 auto" }}>
+    <h2 style={{ marginBottom: "20px", color: "#30364F", fontFamily: "Garamond" }}>
+      {dashboardCourse} Details
+    </h2>
+    <div style={{ background: "#fff", padding: '20px', borderRadius: '15px' }}>
+       <CourseTable 
+         key={dashboardCourse} 
+         data={allCourses[dashboardCourse]} 
+         onMetricsChange={(newRows) => {
+           // هذا السطر هو السر: يحدّث الحالة الكلية فوراً عند أي تغيير في الجدول
+           setAllCourses(prev => ({
+             ...prev,
+             [dashboardCourse]: newRows
+           }));
+         }} 
+       />
+    </div>
+  </div>
+)}
       </main>
     </div>
   );
