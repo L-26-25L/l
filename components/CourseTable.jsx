@@ -59,13 +59,28 @@ export default function CourseTable({ data, onMetricsChange }) {
     return () => clearTimeout(timer);
   }, [totalObtained, totalPossible, excludeQuiz, onMetricsChange, quizzes, lowestQuiz, percentage, remainingForAPlus, remainingForA, bestQuizTotal]);
 const handleChange = (i, val) => {
-  // السماح بترك الخانة فارغة أو كتابة نقطة مؤقتاً
-  if (val === "") {
-    const copy = [...rows];
-    copy[i] = { ...copy[i], obtained: "" };
+  // 1. إنشاء نسخة من الصفوف الحالية لتعديلها
+  const copy = [...rows];
+
+  // 2. السماح بترك الخانة فارغة أو كتابة نقطة مؤقتاً (للسماح بكتابة 9.5 مثلاً)
+  if (val === "" || val === ".") {
+    copy[i] = { ...copy[i], obtained: val };
     setRows(copy);
+    // نرسل البيانات حتى وهي فارغة ليتم تصفير الرسوم مؤقتاً
+    onMetricsChange?.(copy); 
     return;
   }
+
+  // 3. تحديث القيمة في النسخة
+  copy[i] = { ...copy[i], obtained: val };
+  
+  // 4. حفظ النسخة الجديدة في الـ State الخاصة بالجدول
+  setRows(copy);
+
+  // 5. التحديث الفوري: إرسال النسخة الجديدة للمكون الأب (Page.jsx)
+  // هذا السطر هو الذي يجعل الدائرة والمنحنى يتحركون فوراً
+  onMetricsChange?.(copy); 
+};
 
   const numVal = parseFloat(val);
   const copy = [...rows];
