@@ -1,13 +1,24 @@
-export default function GoalCard({ remaining }) {
+export default function GoalCard({ remaining, targetLabel }) {
   return (
-    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%" }}>
-      <div>
-        <h2 style={{ fontSize: "32px", margin: 0, color: "#1a3a5a" }}>{remaining}</h2>
-        <p style={{ fontSize: "12px", fontWeight: "bold", color: "#64748b", margin: 0 }}>
-          Remaining to <span style={{ color: "#4b0082" }}>A+</span>
-        </p>
+    <div style={{ textAlign: 'center', padding: '10px' }}>
+      {/* شكل ميدالية بسيط باستخدام CSS */}
+      <div style={{ 
+        width: '50px', 
+        height: '50px', 
+        background: '#C0C0C0', // فضي
+        borderRadius: '50%', 
+        margin: '0 auto 10px',
+        border: '4px solid #E5E7EB',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+      }}>
+        <div style={{ color: '#fff', fontSize: '20px', fontWeight: 'bold' }}>★</div>
       </div>
-      <div style={{ fontSize: "40px" }}>🏆</div>
+      
+      <p style={{ fontSize: '11px', color: '#ACBAC4', margin: 0 }}>Remaining for {targetLabel}%</p>
+      <h3 style={{ fontSize: '24px', color: '#30364F', margin: '5px 0' }}>{remaining}</h3>
     </div>
   );
 }

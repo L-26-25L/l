@@ -3,8 +3,8 @@ export default function Sidebar({ courses, onSelectCourse, onDashboard }) {
     <div
       style={{
         width: 220,
-        background: "#312936",
-        color: "#d6b25e",
+        background: "#30364F",
+        color: "#ACBAC4",
         padding: 20,
         height: "100vh"
       }}

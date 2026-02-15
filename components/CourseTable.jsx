@@ -58,12 +58,25 @@ export default function CourseTable({ data, onMetricsChange }) {
 
     return () => clearTimeout(timer);
   }, [totalObtained, totalPossible, excludeQuiz, onMetricsChange, quizzes, lowestQuiz, percentage, remainingForAPlus, remainingForA, bestQuizTotal]);
-
-  const handleChange = (i, val) => {
+const handleChange = (i, val) => {
+  // السماح بترك الخانة فارغة أو كتابة نقطة مؤقتاً
+  if (val === "") {
     const copy = [...rows];
-    copy[i] = { ...copy[i], obtained: Number(val) };
+    copy[i] = { ...copy[i], obtained: "" };
     setRows(copy);
-  };
+    return;
+  }
+
+  const numVal = parseFloat(val);
+  const copy = [...rows];
+  // نحدث القيمة كـ string في الإدخال لسهولة الكتابة، لكن الحسابات ستأخذها كرقم
+  copy[i] = { ...copy[i], obtained: val }; 
+  setRows(copy);
+
+  // تحديث البيانات فوراً في الـ Parent (الصفحة الرئيسية)
+  // هذا سيضمن أن Pie Chart وباقي الأشكال تتحرك فور كتابة الرقم
+  onMetricsChange?.(calculateMetrics(copy)); 
+};
 
   return (
     <div style={{ width: "100%" }}>
